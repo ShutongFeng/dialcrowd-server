@@ -29,6 +29,8 @@ const taskModelInteractive = require('./task_models/interactive_task_model.js');
 const taskModelSequence = require('./task_models/sequence_task_model.js');
 const taskModelCategory = require('./task_models/category_task_model.js');
 const taskModelQuality = require('./task_models/quality_task_model.js');
+const dialogueTest = require('./task_models/dialog_check.js')
+
 const mapTaskModel = {
   interactive: taskModelInteractive,
   sequence: taskModelSequence,
@@ -99,15 +101,15 @@ function shuffle(array) {
 }
 
 
-router.get('/task/:task_type/:task_id', function(req, res, next) {
+router.get('/task/:task_type/:task_id', function (req, res, next) {
   switch (req.params.task_type) {
-  case 'interactive':
+    case 'interactive':
       return taskModelInteractive.resGetTask(res, req.params.task_id);
-  case 'category':
+    case 'category':
       return taskModelCategory.resGetTask(res, req.params.task_id);
-  case 'sequence':
+    case 'sequence':
       return taskModelSequence.resGetTask(res, req.params.task_id);
-  case 'quality':
+    case 'quality':
       return taskModelQuality.resGetTask(res, req.params.task_id);
   }
 });
@@ -116,21 +118,21 @@ router.get('/task/:task_type/:task_id', function(req, res, next) {
 // Return the list of projects.
 router.get('/:task_type', function (req, res, next) {
   switch (req.params.task_type) {
-  case "interactive":
-    return taskModelInteractive.resGetProjects(res);
-  case "category":
-    return taskModelCategory.resGetProjects(res);
-  case "sequence":
-    return taskModelSequence.resGetProjects(res);
-  case "quality":
-    return taskModelQuality.resGetProjects(res);
+    case "interactive":
+      return taskModelInteractive.resGetProjects(res);
+    case "category":
+      return taskModelCategory.resGetProjects(res);
+    case "sequence":
+      return taskModelSequence.resGetProjects(res);
+    case "quality":
+      return taskModelQuality.resGetProjects(res);
   }
 });
 
 // Returns the task information with the id given by :createdAt
 router.post('/:task_type/:createdAt', function (req, res, next) {
   if (!(req && req.body)) {
-    return res.status(400).json({err: 'request is invalid'});
+    return res.status(400).json({ err: 'request is invalid' });
   }
   const createdAt = req.params.createdAt;
   const task_type = req.params.task_type;
@@ -138,11 +140,11 @@ router.post('/:task_type/:createdAt', function (req, res, next) {
   const action = req.body;
 
   if (!action || !createdAt) {
-    return res.status(400).json({err: 'bad input parameters'});
+    return res.status(400).json({ err: 'bad input parameters' });
 
   }
   if (!action['password']) {
-    return res.status(400).json({err: 'system response value is missing'})
+    return res.status(400).json({ err: 'system response value is missing' })
   }
   const password = action.password;
   let collection;
@@ -158,12 +160,12 @@ router.post('/:task_type/:createdAt', function (req, res, next) {
   else {
     collection = quality_collection;
   }
-  collection.findOne({'createdAt': parseInt(createdAt)}, function (err, task) {
+  collection.findOne({ 'createdAt': parseInt(createdAt) }, function (err, task) {
     if (err) {
       res.send(err)
     } else {
       let correct = false;
-      if (!passwordHash.isHashed(task.password)) {        
+      if (!passwordHash.isHashed(task.password)) {
         correct = task.password === action.password;
       } else {
         correct = passwordHash.verify(action.password, task.password);
@@ -194,10 +196,10 @@ router.get('/result/:task_type/:task_id', function (req, res, next) {
   else {
     return taskModelQuality.resGetResult(res, task_id);
   }
-  collection.findOne({'task_id': task_id}, function (err, task) {
+  collection.findOne({ 'task_id': task_id }, function (err, task) {
     if (err) {
       res.send(err)
-    } else {      
+    } else {
       res.json(task);
     }
   })
@@ -219,31 +221,32 @@ router.get('/get/systems', function (req, res, next) {
  * Save System
  */
 
- // Updates the system with the corresponding :botid in the systems database
+// Updates the system with the corresponding :botid in the systems database
 router.post('/save/system/:botid', function (req, res, next) {
+  console.log("save bot")
   if (!(req && req.body)) {
-    return res.status(400).json({err: 'request is invalid'});
+    return res.status(400).json({ err: 'request is invalid' });
   }
   const botid = req.params.botid;
 
   if (botid !== "new") {
 
-    let query = {$set: req.body};
-    systems_collection.update({'_id': mongojs.ObjectID(botid)}, query,
-        function (err, updateResult) {
-          if (err) {
-            return res.send(err);
-          }
-          else {
-            res.json({"message": "success"})
-          }
-        });
+    let query = { $set: req.body };
+    systems_collection.update({ '_id': mongojs.ObjectID(botid) }, query,
+      function (err, updateResult) {
+        if (err) {
+          return res.send(err);
+        }
+        else {
+          res.json({ "message": "success" })
+        }
+      });
   }
   else {
     console.log("no botid");
     systems_collection.insert(req.body, function (err, instance) {
       if (err) {
-        res.status(400).json({err: 'new session save failed'});
+        res.status(400).json({ err: 'new session save failed' });
       } else {
         console.log("Done insert new system");
         instance["message"] = "success";
@@ -256,7 +259,7 @@ router.post('/save/system/:botid', function (req, res, next) {
 // Saves the dialog with the userID and name of the dialog (made through interactive mode); used when the user inputs something into the system
 router.post('/dialog_save', function (req, res, next) {
   if (!(req && req.body)) {
-    return res.status(400).json({err: 'request is invalid'});
+    return res.status(400).json({ err: 'request is invalid' });
   }
   const subId = req.body.subId;
   const userID = req.body.userID;
@@ -264,17 +267,16 @@ router.post('/dialog_save', function (req, res, next) {
   const role = req.body.role;
   const utter = req.body.utter;
 
-  interactive_resultcollection.findOne({userID:userID, name_of_dialog:name_of_dialog}, function (err, results) {
-    if(err)
-    {
-      res.status(400).json({err:'err'})
+  interactive_resultcollection.findOne({ userID: userID, name_of_dialog: name_of_dialog }, function (err, results) {
+    if (err) {
+      res.status(400).json({ err: 'err' })
     }
     else {
       if (results) {
-        let query = {$push: {}};
-        query["$push"]["dialog"] = {"role": role, "utter": utter};
-        interactive_resultcollection.update({userID: userID, name_of_dialog:name_of_dialog}, query, function (err, updateResult) {
-	  if (err) {
+        let query = { $push: {} };
+        query["$push"]["dialog"] = { "role": role, "utter": utter };
+        interactive_resultcollection.update({ userID: userID, name_of_dialog: name_of_dialog }, query, function (err, updateResult) {
+          if (err) {
             return res.send(err);
           }
           if (updateResult.nModified) {
@@ -286,16 +288,15 @@ router.post('/dialog_save', function (req, res, next) {
         });
       }
       else {
-        let query = {subId:subId, userID:userID, name_of_dialog:name_of_dialog, feedback:[], dialog:[{role:role, utter:utter}]}
+        let query = { subId: subId, userID: userID, name_of_dialog: name_of_dialog, feedback: [], dialog: [{ role: role, utter: utter }] }
         interactive_resultcollection.insert(query, function (err, updateResult) {
           if (err) {
             return res.send(err);
           }
-          else
-          {
+          else {
             res.json(updateResult)
           }
-        } );
+        });
       }
 
     }
@@ -305,16 +306,16 @@ router.post('/dialog_save', function (req, res, next) {
 // Updates the dialog with the userID and name of the dialog with the feedback given by the worker
 router.post('/feedback', function (req, res, next) {
   if (!(req && req.body)) {
-    return res.status(400).json({err: 'request is invalid'});
+    return res.status(400).json({ err: 'request is invalid' });
   }
   const userID = req.body.userID;
   const name_of_dialog = req.body.name_of_dialog;
   const feedback = req.body.feedback;
   const utter = req.body.utter;
 
-  let query = {$push: {}};
-  query["$push"]["feedback"] = {"utter":utter, feedback:feedback}
-  interactive_resultcollection.update({userID: userID, name_of_dialog:name_of_dialog}, query, function (err, updateResult) {
+  let query = { $push: {} };
+  query["$push"]["feedback"] = { "utter": utter, feedback: feedback }
+  interactive_resultcollection.update({ userID: userID, name_of_dialog: name_of_dialog }, query, function (err, updateResult) {
     if (err) {
       return res.send(err);
     }
@@ -331,126 +332,124 @@ router.post('/feedback', function (req, res, next) {
 // Saves the input from the worker: what they've done for the task including surveys, selections, etc.
 router.post('/save/worker/:task_type/:userID', function (req, res, next) {
   if (!(req && req.body)) {
-    return res.status(400).json({err: 'request is invalid'});
+    return res.status(400).json({ err: 'request is invalid' });
   }
   const task_type = req.params.task_type;
   const userID = req.params.userID;
 
   let collection;
   switch (task_type) {
-  case 'quality':
-    return taskModelQuality.resSave(req, res);
-  case 'category':
-    return taskModelCategory.resSave(req, res);
-  case 'sequence':
-    return taskModelSequence.resSave(req, res);
+    case 'quality':
+      return taskModelQuality.resSave(req, res);
+    case 'category':
+      return taskModelCategory.resSave(req, res);
+    case 'sequence':
+      return taskModelSequence.resSave(req, res);
   }
-    
-    if (task_type === "interactive") {
-        collection = interactive_resultsurvey;
-        let data = req.body.data;
-        let submissiontime = req.body.submissiontime;
-        let subId = req.body.subId;
-        let output = [];
-        let times = req.body.times;
-        Object.keys(data).map((x,_)=> {
-          let temp ={};
-          let X = x.split("|||");
-          temp["Type"] = X[0];
-          temp["A"] = data[x];
-          debugger;
-          if (X[0] === 'Sub')
-          {
-            temp["Name"] = X[1];
-            temp["Type"] = X[2];
-            temp["Q"] = X[3];
-          }
-          else{
-            if (X[0].indexOf("Exit") >= 0){
-              temp["Name"] = "EXIT";
-              temp["Q"]= X[1];
-            }
-            else{
-              temp["Name"] = "FEEDBACK";
-              temp["Q"]= X[1];
-            }
-          }
-          output.push(temp);
-        })
-      
-      let query =  {"survey":output, "times": times, timestamp: submissiontime};
-      taskModelInteractive.collectionResult.updateOne(
-        {subId: subId, userID: userID},
-        {$set: query, $currentDate: {lastModifiedDate: true}},
-        {upsert: true}
-      ).then(
-        () => taskModelInteractive.handleSaved(subId, userID)
-      ).then(
-        () => res.json({success: true})
-      ).catch(err => {
-        res.status(500).json({error: 'Something bad happens.'});
-        console.log(err);
-      });
-    }
+
+  if (task_type === "interactive") {
+    collection = interactive_resultsurvey;
+    let data = req.body.data;
+    let submissiontime = req.body.submissiontime;
+    let subId = req.body.subId;
+    let output = [];
+    let times = req.body.times;
+    Object.keys(data).map((x, _) => {
+      let temp = {};
+      let X = x.split("|||");
+      temp["Type"] = X[0];
+      temp["A"] = data[x];
+      debugger;
+      if (X[0] === 'Sub') {
+        temp["Name"] = X[1];
+        temp["Type"] = X[2];
+        temp["Q"] = X[3];
+      }
+      else {
+        if (X[0].indexOf("Exit") >= 0) {
+          temp["Name"] = "EXIT";
+          temp["Q"] = X[1];
+        }
+        else {
+          temp["Name"] = "FEEDBACK";
+          temp["Q"] = X[1];
+        }
+      }
+      output.push(temp);
+    })
+
+    let query = { "survey": output, "times": times, timestamp: submissiontime };
+    taskModelInteractive.collectionResult.updateOne(
+      { subId: subId, userID: userID },
+      { $set: query, $currentDate: { lastModifiedDate: true } },
+      { upsert: true }
+    ).then(
+      () => taskModelInteractive.handleSaved(subId, userID)
+    ).then(
+      () => res.json({ success: true })
+    ).catch(err => {
+      res.status(500).json({ error: 'Something bad happens.' });
+      console.log(err);
+    });
+  }
   else if (task_type === "category") {
-        collection = category_resultcollection;
-        let context = req.body;
-        let data = context["data"]
-        let userID = context["userID"]
-        let results = JSON.parse(context["Result"])
-        let feedback = context["feedback"]
-        let output = []
-        console.log("context", context);
-        Object.keys(results).forEach(function(x){
-          let temp = {};
-          if (x.indexOf("|||") !== -1){
-            let X = x.split("|||");
-            temp["Type"] = X[0]
-            temp["A"] = results[x]
-            temp["Q"] = X[1]
-            output.push(temp);
+    collection = category_resultcollection;
+    let context = req.body;
+    let data = context["data"]
+    let userID = context["userID"]
+    let results = JSON.parse(context["Result"])
+    let feedback = context["feedback"]
+    let output = []
+    console.log("context", context);
+    Object.keys(results).forEach(function (x) {
+      let temp = {};
+      if (x.indexOf("|||") !== -1) {
+        let X = x.split("|||");
+        temp["Type"] = X[0]
+        temp["A"] = results[x]
+        temp["Q"] = X[1]
+        output.push(temp);
+      }
+    })
+    data.forEach(x => {
+      let sentid = x["sentid"].toString();
+      if (Object.keys(results).includes(sentid)) {
+        let cate = results[sentid];
+        let confidence_cate = 2;
+        if (Object.keys(results).includes("Conf:" + sentid)) {
+          confidence_cate = parseInt(results["Conf:" + sentid]);
+        }
+        collection.findOne({ "projID": context["ID"], "sentid": parseInt(sentid) }, function (err, emd) {
+          if (emd) {
+            let query = { $push: {} };
+            query["$push"]["category"] = cate;
+            query["$push"]["meta"] = {
+              "annotator": context["mid"],
+              "submissionID": userID,
+              "confidence": confidence_cate,
+              "feedback": output,
+              "feedback_questions": feedback
+            };
+            collection.update({ "projID": context["ID"], "sentid": parseInt(sentid) }, query);
           }
-        })
-        data.forEach(x=>{
-        let sentid = x["sentid"].toString();
-        if (Object.keys(results).includes(sentid))
-        {
-          let cate = results[sentid];
-          let confidence_cate = 2;
-          if (Object.keys(results).includes("Conf:"+sentid)){
-            confidence_cate = parseInt(results["Conf:"+sentid]);
-          }
-          collection.findOne({"projID":context["ID"],"sentid":parseInt(sentid)  }, function (err, emd) {
-            if (emd) {
-              let query = {$push: {}};
-              query["$push"]["category"] = cate;
-              query["$push"]["meta"] = {
-                "annotator": context["mid"],
-                "submissionID": userID,
-                "confidence": confidence_cate,
-                "feedback": output,
-                "feedback_questions": feedback
-              };
-              collection.update({"projID":context["ID"],"sentid":parseInt(sentid)  }, query);
-            }
           else {
 
-              collection.insert({
-                "projID": context["ID"],
-                "sentid": parseInt(sentid),
-                "sentence": x["sentence"],
-                "category": [cate],
-                "meta": [{"annotator": context["mid"], "submissionID": userID, "confidence": confidence_cate, "feedback": output, "feedback_questions": feedback}]
-              }, function(err, result){
-              })
-            }
-          })
-        }
-      })
-    }
+            collection.insert({
+              "projID": context["ID"],
+              "sentid": parseInt(sentid),
+              "sentence": x["sentence"],
+              "category": [cate],
+              "meta": [{ "annotator": context["mid"], "submissionID": userID, "confidence": confidence_cate, "feedback": output, "feedback_questions": feedback }]
+            }, function (err, result) {
+            })
+          }
+        })
+      }
+    })
+  }
   else if (task_type === "sequence") {
-    function handleUpdated () {
-        return taskModelSequence.validateSubmission(req.body.ID, req.body.userID)
+    function handleUpdated() {
+      return taskModelSequence.validateSubmission(req.body.ID, req.body.userID)
         // .then(
         //   () => {
         //     return taskModelSequence.updateAgreeInter(req.body.ID);
@@ -461,98 +460,98 @@ router.post('/save/worker/:task_type/:userID', function (req, res, next) {
         //   }
         .then(
           (results) => {
-            res.json({success: true});
+            res.json({ success: true });
           }
         ).catch(
           err => {
             if (err === 'Duplicated submission.') {
-              res.status(409).json({error: err});
+              res.status(409).json({ error: err });
             } else {
               console.log(err);
-              res.status(500).json({error: 'Something bad happens.'});
+              res.status(500).json({ error: 'Something bad happens.' });
             }
           }
         );
     }
-      collection = sequence_resultcollection;
-      let context = req.body;
-      let userID = context["userID"];
-      let x = context["Result"];
-      let List = [];
-      List.push({
-        "sentid": x["sentid"],
-        "sentence": x["sentence"],
-        "annotator": context["mid"],
-        "submissionID": userID,
-        "entity": x["entity"],
-        "time": x["time"],
-        "feedback": x["feedback"]
-      });
-      collection.findOne({"projID": context["ID"], "sentid": x["sentid"]}, function (err, emd) {
+    collection = sequence_resultcollection;
+    let context = req.body;
+    let userID = context["userID"];
+    let x = context["Result"];
+    let List = [];
+    List.push({
+      "sentid": x["sentid"],
+      "sentence": x["sentence"],
+      "annotator": context["mid"],
+      "submissionID": userID,
+      "entity": x["entity"],
+      "time": x["time"],
+      "feedback": x["feedback"]
+    });
+    collection.findOne({ "projID": context["ID"], "sentid": x["sentid"] }, function (err, emd) {
+      if (emd) {
+        let query = { $push: {} };
+        query["$push"]["entity"] = x["entity"];
+        query["$push"]["meta"] = { "annotator": context["mid"], "submissionID": userID, "time": x["time"], "feedback": x["feedback"] };
+        collection.update(
+          {
+            "projID": context["ID"], "sentid": x["sentid"],
+            // prevent double submission.
+            meta: { $not: { $elemMatch: { submissionID: req.body.userID } } }
+          },
+          query, function (err, emd) {
+            handleUpdated();
+          }
+        );
+      }
+      else {
+        collection.insert({
+          "projID": context["ID"],
+          "sentid": x["sentid"],
+          "sentence": x["sentence"],
+          "entity": [x["entity"]],
+          "meta": [{ "annotator": context["mid"], "submissionID": userID, "time": x["time"], "feedback": x["feedback"] }]
+        }, function (err, emd) {
+          handleUpdated();
+        })
+      }
+    })
+
+  }
+  else {
+    collection = quality_resultcollection;
+    let context = req.body;
+    let x = context["Result"];
+    let data = context["data"];
+    data.forEach(function (datas, index) {
+      collection.findOne({ "projID": context["ID"], "sentid": datas["sentid"] }, function (err, emd) {
         if (emd) {
-          let query = {$push: {}};
-          query["$push"]["entity"] = x["entity"];
-          query["$push"]["meta"] = {"annotator": context["mid"], "submissionID": userID, "time": x["time"], "feedback": x["feedback"]};
-          collection.update(
-            {
-              "projID": context["ID"], "sentid": x["sentid"],
-              // prevent double submission.
-              meta: {$not: {$elemMatch: {submissionID: req.body.userID}}} 
-            },
-            query, function (err, emd) {
-              handleUpdated();
-            }
-          );
+          let query = { $push: {} };
+          query["$push"]["meta"] = { "annotator": context["mid"], "submissionID": context["userID"], "time": x.times[index], "feedback": x["feedback"], "responses": x["responses"][index] }
+          collection.update({ "projID": context["ID"], "sentid": datas["sentid"] }, query, function (err, emd) {
+            console.log('a new submission!');
+          })
         }
         else {
           collection.insert({
+            "sentid": datas["sentid"],
             "projID": context["ID"],
-            "sentid": x["sentid"],
-            "sentence": x["sentence"],
-            "entity": [x["entity"]],
-            "meta": [{"annotator": context["mid"], "submissionID": userID, "time": x["time"], "feedback": x["feedback"]}]
+            "context": datas["context"],
+            "response": datas["response"],
+            "meta": [{ "annotator": context["mid"], "submissionID": context["userID"], "time": x["times"][index], "feedback": x["feedback"], "responses": x["responses"][index] }]
           }, function (err, emd) {
-            handleUpdated();
           })
         }
       })
+    })
 
-    }
-    else {
-      collection = quality_resultcollection;
-      let context = req.body;
-      let x = context["Result"];
-      let data = context["data"];
-      data.forEach(function(datas, index){
-        collection.findOne({"projID": context["ID"], "sentid": datas["sentid"]}, function(err, emd){
-          if (emd) {
-            let query = {$push: {}};
-            query["$push"]["meta"] = {"annotator": context["mid"], "submissionID": context["userID"], "time": x.times[index], "feedback": x["feedback"], "responses": x["responses"][index]}
-              collection.update({"projID": context["ID"], "sentid": datas["sentid"]}, query, function(err, emd){
-                  console.log('a new submission!');
-            })
-          }
-          else{
-            collection.insert({
-              "sentid": datas["sentid"],
-              "projID": context["ID"],
-              "context": datas["context"],
-              "response": datas["response"],
-              "meta": [{"annotator": context["mid"], "submissionID": context["userID"], "time": x["times"][index], "feedback": x["feedback"], "responses": x["responses"][index]}]
-            }, function(err, emd) {
-            })
-          }
-        })
-      })
-      
-    }
+  }
 });
 
 
 // Saves task when requester puts out a HIT
 router.post('/save/task/:task_type/:task_id', function (req, res, next) {
   if (!(req && req.body)) {
-    return res.status(400).json({err: 'request is invalid'});
+    return res.status(400).json({ err: 'request is invalid' });
   }
   const task_type = req.params.task_type;
   const task_id = req.params.task_id;
@@ -566,7 +565,7 @@ router.post('/save/task/:task_type/:task_id', function (req, res, next) {
       "password": req.body.password,
       "name_of_dialog": [],
       "dialog_examples": [],
-      "dialog_counterexamples": [],        
+      "dialog_counterexamples": [],
       "name": req.body.project,
       "keys": [],
       "specific_instructions": [],
@@ -666,23 +665,23 @@ router.post('/save/task/:task_type/:task_id', function (req, res, next) {
   }
   if (task_id !== "new") {
     console.log("**CHANGE BOT CONFIGURE**");
-    let query = {$set: req.body, $currentDate: {lastModifiedDate: true}};
-    collection.update({'_id': mongojs.ObjectID(task_id)}, query,
-        function (err, updateResult) {
-          if (err) {
-            return res.send(err);
-          }
-          console.log("Task added");
-          updateResult["message"] = "success";
-          res.json(updateResult);
-        });
+    let query = { $set: req.body, $currentDate: { lastModifiedDate: true } };
+    collection.update({ '_id': mongojs.ObjectID(task_id) }, query,
+      function (err, updateResult) {
+        if (err) {
+          return res.send(err);
+        }
+        console.log("Task added");
+        updateResult["message"] = "success";
+        res.json(updateResult);
+      });
   }
   else {
     console.log("NO BOT NEW PROJECT");
     data.password = passwordHash.generate(data.password);
     collection.insert(data, function (err, instance) {
       if (err) {
-        res.status(400).json({err: 'new session save failed'});
+        res.status(400).json({ err: 'new session save failed' });
       } else {
         console.log("Done insert new system");
         instance["message"] = "success";
@@ -710,11 +709,11 @@ router.get('/get/detail_result/:task_type/:task_id', function (req, res, next) {
 
   let collection;
 
-  if (task_type === "category"){
+  if (task_type === "category") {
     collection = category_detail_result_collection;
   }
 
-  collection.find({"taskId": task_id}, function (err, results) {
+  collection.find({ "taskId": task_id }, function (err, results) {
     let Dic = {};
     let Output = [];
 
@@ -739,21 +738,21 @@ router.get('/get/detail_result/:task_type/:task_id', function (req, res, next) {
     let outlier = "no";
     let mean;
     let stdev;
-    
+
     Object.keys(Dic).forEach(userId => {
       let x = Dic[userId]["duration"];
       let sum_x = x.reduce((a, b) => a + b, 0);
       all_totals.push(sum_x);
     });
 
-    try{
+    try {
       mean = getMean(all_totals);
       stdev = getSD(all_totals);
     }
-    catch(err){
+    catch (err) {
       // console.log("empty");
     }
-    
+
 
     let std = 0;
     Object.keys(Dic).forEach(userId => {
@@ -770,16 +769,16 @@ router.get('/get/detail_result/:task_type/:task_id', function (req, res, next) {
         if ([... new Set(y)].length < 2) {
           allsame = "yes"
         }
-        else{
+        else {
           allsame = "no"
         }
       }
       // check for outliers, 2.5% tails of the data of avg time (2 std away from mean)
       // calculated from total time
-      if (sum_x < (mean - 2*stdev) || sum_x > (mean + 2*stdev)){
+      if (sum_x < (mean - 2 * stdev) || sum_x > (mean + 2 * stdev)) {
         outlier = "yes"
       }
-      else{
+      else {
         outlier = "no"
       }
       Output.push({
@@ -793,7 +792,7 @@ router.get('/get/detail_result/:task_type/:task_id', function (req, res, next) {
         "outlier": outlier
       })
     });
-    res.json({"response": Output});
+    res.json({ "response": Output });
   })
 });
 
@@ -804,24 +803,24 @@ router.get('/get/result/:task_type/:task_id', function (req, res, next) {
   let collection;
   if (task_type === "interactive") {
     collection = interactive_resultcollection;
-    collection.find({'subId': task_id}, function (err, task) {
+    collection.find({ 'subId': task_id }, function (err, task) {
       if (err) {
         return res.send(err)
       }
       else {
         // console.log(task);
-        interactive_resultsurvey.find({subId: task_id}, function (err, survey) {
+        interactive_resultsurvey.find({ subId: task_id }, function (err, survey) {
           console.log("task", task);
           console.log("survey", survey);
           //survey.forEach(x=>{console.log(x)});
-          return res.json({"dialog": task, "survey": survey, "status": 200});
+          return res.json({ "dialog": task, "survey": survey, "status": 200 });
         })
       }
     })
   }
   else if (task_type === "category") {
     collection = category_resultcollection;
-    collection.find({'projID': task_id}, function (err, task) {
+    collection.find({ 'projID': task_id }, function (err, task) {
       if (err) {
         return res.send(err)
       }
@@ -830,51 +829,51 @@ router.get('/get/result/:task_type/:task_id', function (req, res, next) {
         let result_for_kappa = {};
         let category = [];
         task.forEach((x, _) => {
-              let tem = {};
-              tem["sentence"] = x["sentence"];
-              tem["sentid"] = x["sentid"];
-              tem["result"] = [];
-              let Dic = {};
-              let conf = 2;
+          let tem = {};
+          tem["sentence"] = x["sentence"];
+          tem["sentid"] = x["sentid"];
+          tem["result"] = [];
+          let Dic = {};
+          let conf = 2;
 
-              x["category"].forEach(function (cate, i) {
-                if (!category.includes(cate)) {
-                  category.push(cate);
-                }
-                if (x["meta"][i]){
-                  let annotator_id = x["meta"][i]["submissionID"].toString();
-
-                  if (!Object.keys(result_for_kappa).includes(annotator_id)) {
-                    result_for_kappa[annotator_id] = {};
-                  }
-
-                  result_for_kappa[annotator_id][x["sentid"]] = cate;
-                  if (!Dic.hasOwnProperty(x["meta"][i]["submissionID"])) {
-                    Dic[x["meta"][i]["submissionID"]] = 0;
-                        if (x["meta"][i].hasOwnProperty("confidence")) {
-                          conf = x["meta"][i]["confidence"];
-                        }
-                        else {
-                          conf = 2;
-                        }
-                        tem["result"].push({
-                          "category": cate,
-                          "annotator": x["meta"][i]["annotator"],
-                          "submissionID": x["meta"][i]["submissionID"],
-                          "confidence": conf,
-                          "feedback": x["meta"][i]["feedback"],
-                          "feedback_questions": x["meta"][i]["feedback_questions"]
-                        });
-                        tem["num"] = Object.keys(Dic).length;
-                        List.push(tem);
-                    }
-                  }
-                }
-              );
+          x["category"].forEach(function (cate, i) {
+            if (!category.includes(cate)) {
+              category.push(cate);
             }
+            if (x["meta"][i]) {
+              let annotator_id = x["meta"][i]["submissionID"].toString();
+
+              if (!Object.keys(result_for_kappa).includes(annotator_id)) {
+                result_for_kappa[annotator_id] = {};
+              }
+
+              result_for_kappa[annotator_id][x["sentid"]] = cate;
+              if (!Dic.hasOwnProperty(x["meta"][i]["submissionID"])) {
+                Dic[x["meta"][i]["submissionID"]] = 0;
+                if (x["meta"][i].hasOwnProperty("confidence")) {
+                  conf = x["meta"][i]["confidence"];
+                }
+                else {
+                  conf = 2;
+                }
+                tem["result"].push({
+                  "category": cate,
+                  "annotator": x["meta"][i]["annotator"],
+                  "submissionID": x["meta"][i]["submissionID"],
+                  "confidence": conf,
+                  "feedback": x["meta"][i]["feedback"],
+                  "feedback_questions": x["meta"][i]["feedback_questions"]
+                });
+                tem["num"] = Object.keys(Dic).length;
+                List.push(tem);
+              }
+            }
+          }
+          );
+        }
         );
         if (Object.keys(result_for_kappa).length < 2) {
-          return res.json({"status": 200, "flag": true, "response": List, "kappa": {}});
+          return res.json({ "status": 200, "flag": true, "response": List, "kappa": {} });
         }
         else {
           let kappa = {};
@@ -892,30 +891,30 @@ router.get('/get/result/:task_type/:task_id', function (req, res, next) {
 
             })
           })
-          return res.json({"status": 200, "flag": true, "response": List, "kappa": kappa});
+          return res.json({ "status": 200, "flag": true, "response": List, "kappa": kappa });
         }
       }
     });
   }
   else if (task_type === "sequence") {
     collection = sequence_resultcollection;
-    collection.find({'projID': task_id}, function (err, task) {
+    collection.find({ 'projID': task_id }, function (err, task) {
       if (err) {
         return res.send(err)
       }
       else {
-        return res.json({"response": task, "status": 200});
+        return res.json({ "response": task, "status": 200 });
       }
     })
   }
   else {
     collection = quality_resultcollection;
-    collection.find({'projID': task_id}, function (err, task) {
+    collection.find({ 'projID': task_id }, function (err, task) {
       if (err) {
         return res.send(err)
       }
       else {
-        return res.json({"response": task, "status": 200});
+        return res.json({ "response": task, "status": 200 });
       }
     })
   }
@@ -928,8 +927,8 @@ router.post('/delete/:task_type/:task_id', function (req, res, next) {
   const password = req.body.password;
 
   if (mapTaskModel[taskType] === undefined) {
-    return res.status(500).json({error: "unsupported task"})
-  } else { 
+    return res.status(500).json({ error: "unsupported task" })
+  } else {
     return mapTaskModel[taskType].resDeleteProject(
       res, taskId, password
     )
@@ -939,27 +938,27 @@ router.post('/delete/:task_type/:task_id', function (req, res, next) {
   let collection;
   if (task_type === "interactive") {
     collection = interactive_collection;
-    interactive_resultcollection.remove({'projID': task_id});
+    interactive_resultcollection.remove({ 'projID': task_id });
   }
   else if (task_type === "category") {
     collection = category_collection;
 
-    category_resultcollection.remove({'projID': task_id});
-    category_detail_result_collection.remove({'taskId': task_id});
+    category_resultcollection.remove({ 'projID': task_id });
+    category_detail_result_collection.remove({ 'taskId': task_id });
   }
   else if (task_type === "sequence") {
     collection = sequence_collection;
-    sequence_resultcollection.remove({'projID': task_id});
+    sequence_resultcollection.remove({ 'projID': task_id });
   }
   else {
     collection = quality_collection;
-    quality_resultcollection.remove({'projID': task_id});
+    quality_resultcollection.remove({ 'projID': task_id });
   }
-  collection.remove({'_id': mongojs.ObjectID(task_id)}, function (err, task) {
+  collection.remove({ '_id': mongojs.ObjectID(task_id) }, function (err, task) {
     if (err) {
       res.send(err)
     } else {
-      res.json({"response": task});
+      res.json({ "response": task });
     }
   })
 });
@@ -974,12 +973,12 @@ router.get('/delete/result/:task_type/:task_id', function (req, res, next) {
   let collection;
   if (task_type === "interactive") {
     collection = interactive_resultcollection;
-    collection.remove({'userID': task_id}, function (err, task) {
+    collection.remove({ 'userID': task_id }, function (err, task) {
     });
-    taskModelInteractive.resDeleteSubmission(res, idSubmission);    
+    taskModelInteractive.resDeleteSubmission(res, idSubmission);
   }
   else if (task_type === "category") {
-    category_detail_result_collection.remove({'userId': parseInt(task_id)});
+    category_detail_result_collection.remove({ 'userId': parseInt(task_id) });
     taskModelCategory.resDeleteSubmission(res, idSubmission);
   }
   else if (task_type === "sequence") {
@@ -1041,9 +1040,9 @@ router.get('/worker/:task_type/:task_id', function (req, res, next) {
     case "sequence":
       return taskModelSequence.resHit(res, task_id);
 
-    case "quality": 
+    case "quality":
       return taskModelQuality.resHit(res, task_id);
-      
+
   }
 
   console.log(task_id);
@@ -1060,7 +1059,7 @@ router.get('/worker/:task_type/:task_id', function (req, res, next) {
   else {
     collection = quality_collection;
   }
-  collection.findOne({'_id': mongojs.ObjectID(task_id)}, function (err, task) {
+  collection.findOne({ '_id': mongojs.ObjectID(task_id) }, function (err, task) {
     if (err) {
       res.send(err)
     } else {
@@ -1068,38 +1067,37 @@ router.get('/worker/:task_type/:task_id', function (req, res, next) {
       if (task_type === "category") {
         task["exampleTable"] = [];
         task["category_data"] = shuffle(task["category_data"]);
-        task["classLabel"].map((x,i) => {
-          try{
-            task["exampleTable"].push({"label":x, "example": task["classExample"][i], "counterexample": task["classCounterexample"][i]})
+        task["classLabel"].map((x, i) => {
+          try {
+            task["exampleTable"].push({ "label": x, "example": task["classExample"][i], "counterexample": task["classCounterexample"][i] })
           }
-          catch(err){
-            task["exampleTable"].push({"label":x, "example": task["classExample"][i]})
+          catch (err) {
+            task["exampleTable"].push({ "label": x, "example": task["classExample"][i] })
           }
         })
         res.json(task);
       }
-      else if(task_type === "sequence")
-      {
+      else if (task_type === "sequence") {
         task["sequence_data"] = shuffle(task["sequence_data"]);
         task["exampleTable"] = [];
-        task["Label"].map((x,i) => {
-          try{
-            task["exampleTable"].push({"label":x, "example": task["Example"][i], "counterexample": task["Counterexample"][i]})
+        task["Label"].map((x, i) => {
+          try {
+            task["exampleTable"].push({ "label": x, "example": task["Example"][i], "counterexample": task["Counterexample"][i] })
           }
-          catch(err){
-            task["exampleTable"].push({"label":x, "example": task["Example"][i]})
+          catch (err) {
+            task["exampleTable"].push({ "label": x, "example": task["Example"][i] })
           }
         })
         res.json(task);
       }
-      else if(task_type === "interactive"){
+      else if (task_type === "interactive") {
         task["exampleTable"] = [];
-        task["pollquestion"].map((x,i) => {
-          try{
-            task["exampleTable"].push({"question":x, "example": task["example"][i], "counterexample": task["counterexample"][i]})
+        task["pollquestion"].map((x, i) => {
+          try {
+            task["exampleTable"].push({ "question": x, "example": task["example"][i], "counterexample": task["counterexample"][i] })
           }
-          catch(err){
-            task["exampleTable"].push({"question":x, "counterexample": task["counterexample"][i]})
+          catch (err) {
+            task["exampleTable"].push({ "question": x, "counterexample": task["counterexample"][i] })
           }
         })
         res.json(task);
@@ -1111,18 +1109,18 @@ router.get('/worker/:task_type/:task_id', function (req, res, next) {
 const client_manager = {
   MAX_INT: 100000,
   _clients_to_id: {},
-  join_client: function(session_id){
+  join_client: function (session_id) {
     var is_new = false;
     var msg = "";
-    if (Object.keys(this._clients_to_id).includes(session_id)){
+    if (Object.keys(this._clients_to_id).includes(session_id)) {
       msg = "You have connected to an existing session";
       is_new = false;
     }
-    else{
+    else {
       msg = "Hello! Welcome to DialCrowd! Say or type START to begin."
       url = session_id.split("\t")[1] + "/%s";
       console.log(url);
-      if (!(url.includes("http"))){
+      if (!(url.includes("http"))) {
         url = "http://" + url.replace(/^\s+|\s+$/g, '');
       }
       cm = Object.create(client_meta);
@@ -1133,41 +1131,41 @@ const client_manager = {
     }
     return [is_new, msg];
   },
-  activate_talk: function(session_id){
-    if (Object.keys(this._clients_to_id).includes(session_id)){
+  activate_talk: function (session_id) {
+    if (Object.keys(this._clients_to_id).includes(session_id)) {
       this._clients_to_id[session_id].is_active = true;
     }
   },
-  deactivate_talk: function(session_id){
-    if (Object.keys(this._clients_to_id).includes(session_id)){
+  deactivate_talk: function (session_id) {
+    if (Object.keys(this._clients_to_id).includes(session_id)) {
       this._clients_to_id[session_id].is_active = false;
     }
   },
-  get_active: function(session_id){
-    if (Object.keys(this._clients_to_id).includes(session_id)){
+  get_active: function (session_id) {
+    if (Object.keys(this._clients_to_id).includes(session_id)) {
       return this._clients_to_id[session_id].is_active;
     }
-    else{
+    else {
       return null;
     }
   },
-  get_url: function(session_id){
-    if (Object.keys(this._clients_to_id).includes(session_id)){
+  get_url: function (session_id) {
+    if (Object.keys(this._clients_to_id).includes(session_id)) {
       return this._clients_to_id[session_id].url;
     }
-    else{
+    else {
       return null;
     }
   },
-  get_task: function(session_id){
-    if (Object.keys(this._clients_to_id).includes(session_id)){
+  get_task: function (session_id) {
+    if (Object.keys(this._clients_to_id).includes(session_id)) {
       return this._clients_to_id[session_id].task;
     }
-    else{
+    else {
       return null;
     }
   },
-  remove_client: function(session_id){
+  remove_client: function (session_id) {
     delete this._clients_to_id[session_id]
   }
 };
@@ -1176,11 +1174,11 @@ const client_meta = {
   task: "",
   url: "",
   _is_active: false,
-  is_active: function(value){
-    if (value){
+  is_active: function (value) {
+    if (value) {
       this._is_active = value;
     }
-    else{
+    else {
       return this._is_active
     }
   }
@@ -1191,25 +1189,25 @@ var util = require('util');
 const cli_manager = Object.create(client_manager);
 
 // Initializes and puts the new session in the client manager
-router.post('/router/chat/join', function(req, res, next){
+router.post('/router/chat/join', function (req, res, next) {
   const session_id = req.body.sid + "";
-  if (!session_id){
+  if (!session_id) {
     console.log("Missing session id. Reject connection");
   }
-  else{
+  else {
     console.log(util.format("%s makes connection", session_id));
     returned = cli_manager.join_client(session_id);
     is_new = returned[0];
     msg = returned[1];
-    res.send({"action": 'status', "is_new": is_new, "msg": msg});
+    res.send({ "action": 'status', "is_new": is_new, "msg": msg });
   }
 });
 
-function get_resp(body){
+function get_resp(body) {
   // display, extraDiv1, and extraDiv2 are all extra variables; requesters can pass in other
   // variables other than the response
   // this is for research purposes
-  try{
+  try {
     var sys = body.sys || "";
     var sesID = body.sessionID || "";
     var display = body.display || "";
@@ -1217,15 +1215,15 @@ function get_resp(body){
     var extraDiv2 = body.extraDiv2 || "";
     return [(body.terminal || false), sys, sesID, display, extraDiv1, extraDiv2];
   }
-  catch (error){
+  catch (error) {
     return [true, "error"];
   }
 }
 
 // Connects back to the active session_id and sends the user message to the remote system
-router.post('/router/chat/usr_input', function(req, res, next){
+router.post('/router/chat/usr_input', function (req, res, next) {
   const session_id = req.body.sid + "";
-  if (!(session_id)){
+  if (!(session_id)) {
     console.log("Missing session id. Reject connection");
     return;
   }
@@ -1237,69 +1235,70 @@ router.post('/router/chat/usr_input', function(req, res, next){
   server_url = cli_manager.get_url(session_id);
   console.log(server_url, "server_url")
 
-  if ("start" == usr_input.toLowerCase().trim()){
+  if ("start" == usr_input.toLowerCase().trim()) {
     cli_manager.activate_talk(session_id);
     url = server_url.replace("%s", "init");
-    payload = {"sessionID": session_id, "timeStamp": "TODO", "userID": userID}
+    payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
   }
-  else if (!(cli_manager.get_active(session_id))){
-    res.send({"action": 'status', "msg": "Please type or say START to begin."});
+  else if (!(cli_manager.get_active(session_id))) {
+    res.send({ "action": 'status', "msg": "Please type or say START to begin." });
     return;
   }
-  else{
+  else {
     url = server_url.replace("%s", "next");
-    payload = {"sessionID": session_id, "text": usr_input, "asrConf": asr_conf, "timeStamp": "TODO", "userID": userID}
+    payload = { "sessionID": session_id, "text": usr_input, "asrConf": asr_conf, "timeStamp": "TODO", "userID": userID }
   }
-  
+
   console.log("Send message " + JSON.stringify(payload));
   console.log(url)
   request.post(url, {
     json: payload
   }, (error, resp, body) => {
-    if (error){
+    if (error) {
       console.error(error);
     }
-    if (resp){
+    if (resp) {
       console.log(resp.statusCode);
       console.log(body);
-      if (resp.statusCode == 200){
+      if (resp.statusCode == 200) {
         console.log("Received " + body);
         response_get = get_resp(body);
         console.log("msg", response_get[1], typeof response_get[1]);
         console.log(JSON.stringify(response_get[1]));
         console.log("sent message");
-        if (response_get[0]){
+        if (response_get[0]) {
           cli_manager.deactivate_talk(session_id);
         }
-        res.send({"action": 'message', "terminal": response_get[0], "msg": response_get[1], "display": response_get[3], "extraDiv1": response_get[4], "extraDiv2": response_get[5]});
+        res.send({ "action": 'message', "terminal": response_get[0], "msg": response_get[1], "display": response_get[3], "extraDiv1": response_get[4], "extraDiv2": response_get[5] });
       }
     }
-    else{
-      res.send({"action": 'message', 'msg': "Network connection error", "terminal": true});
+    else {
+      res.send({ "action": 'message', 'msg': "Network connection error", "terminal": true });
     }
   })
 });
 
 // Connects to the active session_id and sends a post request to the remote system to end the conversation; also removes the session from the active session list
-router.post('/router/chat/leave', function(req, res, next){
+router.post('/router/chat/leave', function (req, res, next) {
   session_id = req.body.sid + "";
   is_active = cli_manager.get_active(session_id);
-  if (session_id == null){
+  if (session_id == null) {
     console.log("session id not found");
     return;
   }
   console.log(session_id + " leave the session when " + is_active.toString());
   server_url = client_manager.get_url(session_id);
   url = server_url.replace("%s", "next");
-  if (is_active == true){
+  if (is_active == true) {
     request.post(url, {
       json: {
         "sessionID": session_id,
-	      "text": "SSTTOOPP",
-	      "asrConf": 1.0,
-	      "timeStamp": "TODO"}
-      }, (error, resp, body) => {
-      if (error){
+        "text": "SSTTOOPP",
+        "asrConf": 1.0,
+        "timeStamp": "TODO"
+      }
+    }, (error, resp, body) => {
+      if (error) {
         console.error(error);
       }
     })
@@ -1307,16 +1306,16 @@ router.post('/router/chat/leave', function(req, res, next){
   cli_manager.remove_client(session_id);
 });
 
-router.post('/save/worker/detail/:task_type/:userID', function(req, res, next){
+router.post('/save/worker/detail/:task_type/:userID', function (req, res, next) {
   const task_type = req.params.task_type;
   const userID = req.params.userID;
   let collection;
-  
-  if (task_type === "category"){
+
+  if (task_type === "category") {
     collection = category_detail_result_collection;
     collection.insert(req.body.data, function (err, data) {
       if (err) {
-        res.status(400).json({err: 'worker detail info save failed'});
+        res.status(400).json({ err: 'worker detail info save failed' });
       } else {
         console.log("Done update worker detail");
         res.json(data);
@@ -1324,5 +1323,26 @@ router.post('/save/worker/detail/:task_type/:userID', function(req, res, next){
     });
   }
 })
+
+// validate the interactive dialogue is acceptable or not based on simple rules
+router.get('/validate/dialogue/:task_id/:user_id/:bot_name', function (req, res, next) {
+
+  const task_id = req.params.task_id;
+  const user_id = req.params.user_id;
+  const chatbot_name = req.params.bot_name;
+
+  let collection = interactive_resultcollection;
+  console.log("validate dialogue (rest_api)")
+  collection.find({ 'subId': task_id, "userID": user_id, "name_of_dialog": chatbot_name }, function (err, task) {
+    if (err) {
+      console.log("err!", err)
+      return res.send(err)
+    }
+    else {
+      console.log("dialogueTest go")
+      return res.json(dialogueTest(task));
+    }
+  })
+});
 
 module.exports = router;

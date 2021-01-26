@@ -1,16 +1,17 @@
 import React from "react";
-import {Button, Divider, Drawer, Icon, Input, message, Popconfirm, Table} from 'antd';
-import {connect} from "react-redux";
+import { Button, Divider, Drawer, Icon, Input, message, Popconfirm, Table } from 'antd';
+import { connect } from "react-redux";
 import Highlighter from 'react-highlight-words';
-import {SearchOutlined} from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import NewSystem from "./NewSystem";
 import HelpConnectSystem from "./help/HelpConnectSystem";
 import Iframe from 'react-iframe'
-import {Form} from "antd/lib/index";
-import {clientUrl, serverUrl} from '../configs'
-import {newSystem} from '../actions/systemActions';
+import { Form } from "antd/lib/index";
+import { clientUrl, serverUrl } from '../configs'
+import { newSystem } from '../actions/systemActions';
 
 function Submit(t, data, id) {
+  console.log(serverUrl)
   fetch(serverUrl + '/api/save/system/' + id, {
     method: 'POST',
     headers: {
@@ -19,25 +20,25 @@ function Submit(t, data, id) {
     },
     body: JSON.stringify(data)
   })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (json) {
-        if (json.message === "success") {
-          message.success("Success");
-          t.props.newSystem();
-        }
-        else {
-          message.success("Fail");
-        }
-      });
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (json) {
+      if (json.message === "success") {
+        message.success("Success");
+        t.props.newSystem();
+      }
+      else {
+        message.success("Fail");
+      }
+    });
 }
 
 
 class AddSystem extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {visible: false, configure_visible: false, url: "", data: {}, inputText: ""}
+    this.state = { visible: false, configure_visible: false, url: "", data: {}, inputText: "" }
   }
 
   showbotconfigure = () => {
@@ -78,26 +79,26 @@ class AddSystem extends React.Component {
     });
   }
   onChangeInput = (e) => {
-    this.setState({inputText: e.target.value});
+    this.setState({ inputText: e.target.value });
   };
   confirm = (e) => {
     console.log(e);
     if (e["password"] === this.state.inputText) {
-      this.setState({inputText: ""});
+      this.setState({ inputText: "" });
       this.props.form.resetFields();
       this.setState({
         data: e, configure_visible: true,
       });
     }
     else {
-      message.error('Please check your password or contact: kyusonglee@gmail.com');
-      this.setState({inputText: ""});
+      message.error('Please check your password or contact: linh@hhu.de');
+      this.setState({ inputText: "" });
     }
   }
 
   cancel = (e) => {
     console.log(e);
-    this.setState({inputText: ""});
+    this.setState({ inputText: "" });
   }
 
 
@@ -125,7 +126,7 @@ class AddSystem extends React.Component {
           ref={node => {
             this.searchInput = node;
           }}
-          placeholder={dataIndex !== 'nickname' ? `Search project`: `Search creator`}
+          placeholder={dataIndex !== 'nickname' ? `Search project` : `Search creator`}
           value={selectedKeys[0]}
           onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
@@ -165,8 +166,8 @@ class AddSystem extends React.Component {
           textToHighlight={text.toString()}
         />
       ) : (
-        text
-      ),
+          text
+        ),
   });
 
   handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -184,8 +185,8 @@ class AddSystem extends React.Component {
 
   render() {
     // preemptively sort the table
-    if (this.props.system.length > 0){
-      this.props.system.sort(function(a, b){
+    if (this.props.system.length > 0) {
+      this.props.system.sort(function (a, b) {
         return a.name.localeCompare(b.name);
       })
     }
@@ -219,67 +220,67 @@ class AddSystem extends React.Component {
       width: '15%'
 
     },
-      {
-        title: '',
-        key: 'action',
-        width: '15%',
-        render: (text, record) => (
+    {
+      title: '',
+      key: 'action',
+      width: '15%',
+      render: (text, record) => (
+        <span>
+          <Button shape={"circle"} disabled={!record.github}>
+            <a href={record.github} target={"_blank"}><Icon type="github" /></a>
+          </Button>
+          <Divider type="vertical" />
+          <Popconfirm title={
             <span>
-            <Button shape={"circle"} disabled={!record.github}>
-              <a href={record.github} target={"_blank"}><Icon type="github"/></a>
-            </Button>
-            <Divider type="vertical"/>
-            <Popconfirm title={
-              <span>
-                    <h3>Password</h3>
-                    <p>"Please type in the password of this system"</p>
-                  <Input
-                      placeholder="Password"
-                      value={this.state.inputText}
-                      onChange={this.onChangeInput}
-                  />
-                </span>} onConfirm={() => this.confirm(record)} onCancel={this.cancel} okText="Yes" cancelText="No">
-              <Button shape={"circle"}><Icon type="edit"/></Button>
-            </Popconfirm>
-      <Divider type="vertical"/>
-        <Button shape={"circle"} onClick={() => this.showDrawer(record.url)}>
-          <Icon type="message"/>
-        </Button>
-          </span>
-        ),
-      }];
+              <h3>Password</h3>
+              <p>"Please type in the password of this system"</p>
+              <Input
+                placeholder="Password"
+                value={this.state.inputText}
+                onChange={this.onChangeInput}
+              />
+            </span>} onConfirm={() => this.confirm(record)} onCancel={this.cancel} okText="Yes" cancelText="No">
+            <Button shape={"circle"}><Icon type="edit" /></Button>
+          </Popconfirm>
+          <Divider type="vertical" />
+          <Button shape={"circle"} onClick={() => this.showDrawer(record.url)}>
+            <Icon type="message" />
+          </Button>
+        </span>
+      ),
+    }];
 
     return <div>
       <h1> Dialog Systems for Testing</h1>
       <Drawer
-          placement="right"
-          width={720}
-          closable={false}
-          onClose={this.onClose}
-          visible={this.state.visible}
+        placement="right"
+        width={720}
+        closable={false}
+        onClose={this.onClose}
+        visible={this.state.visible}
       >
-        <Iframe style={{"margin-right": "10px"}} url={this.state.url}
-                width="90%"
-                height="700px"
-                display="initial"
-                position="relative"
-                allowFullScreen/>
+        <Iframe style={{ "margin-right": "10px" }} url={this.state.url}
+          width="90%"
+          height="700px"
+          display="initial"
+          position="relative"
+          allowFullScreen />
       </Drawer>
-      <div style={{display: "flex"}}>
+      <div style={{ display: "flex" }}>
         <Button onClick={this.showbotconfigure}>
-          <Icon type="folder-add"/>Create
+          <Icon type="folder-add" />Create
         </Button>
 
-        <HelpConnectSystem/>
+        <HelpConnectSystem />
       </div>
       <NewSystem
-          visible={this.state.configure_visible}
-          onClose={this.onConfigureClose}
-          data={this.state.data}
-          submit={this.submit}
-          form={this.props.form}
+        visible={this.state.configure_visible}
+        onClose={this.onConfigureClose}
+        data={this.state.data}
+        submit={this.submit}
+        form={this.props.form}
       />
-      <Table rowKey={"_id"} columns={columns} bordered dataSource={this.props.system}/>
+      <Table rowKey={"_id"} columns={columns} bordered dataSource={this.props.system} />
 
     </div>
   }

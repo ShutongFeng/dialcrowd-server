@@ -1,15 +1,15 @@
 import React from "react";
-import {Button, Collapse, Drawer, Form, Input, Modal, Radio, Rate, Table, Tooltip} from 'antd';
-import {clientUrl, serverUrl} from "../../configs";
-import {ConsentForm, AnonymityNotice} from "./AgreeModal";
+import { Button, Collapse, Drawer, Form, Input, Modal, Radio, Rate, Table, Tooltip } from 'antd';
+import { clientUrl, serverUrl } from "../../configs";
+import { ConsentForm, AnonymityNotice } from "./AgreeModal";
 import queryString from 'query-string';
 import Iframe from 'react-iframe';
-import {connect} from "react-redux";
-import QuestionList, {Markdown} from "./QuestionList.js";
-import {lists2Questions, addKeys} from "../requesters/template/QuestionList.js";
-import {lists2Systems} from "../requesters/template/System.js";
-import {showFeedbackQuestion} from "./QuestionList.js";
-import {getStyle} from "./style.js";
+import { connect } from "react-redux";
+import QuestionList, { Markdown } from "./QuestionList.js";
+import { lists2Questions, addKeys } from "../requesters/template/QuestionList.js";
+import { lists2Systems } from "../requesters/template/System.js";
+import { showFeedbackQuestion } from "./QuestionList.js";
+import { getStyle } from "./style.js";
 
 
 const Panel = Collapse.Panel;
@@ -36,15 +36,14 @@ function shuffle(array) {
   return array;
 }
 
-function preprocess(emb)
-{
+function preprocess(emb) {
   let Output = {};
   Output["intro"] = emb["generic_introduction"];
   Output["instructions"] = emb["generic_instructions"];
   Output["speech"] = emb["speech"];
   Output["MNor1N"] = emb["MNor1N"];
 
-  while (emb["exampleTable"][0] && !(emb["exampleTable"][0].question)){
+  while (emb["exampleTable"][0] && !(emb["exampleTable"][0].question)) {
     emb["exampleTable"].shift();
   }
 
@@ -56,7 +55,7 @@ function preprocess(emb)
     temp["specific_instructions"] = emb["specific_instructions"][i];
     temp["subpoll"] = emb["subpoll"][i];
     temp["subtypeofpoll"] = emb["subtypeofpoll"][i];
-    temp["url_dialog_system"]= emb["url_dialog_system"][i]
+    temp["url_dialog_system"] = emb["url_dialog_system"][i]
     body.push(temp);
   }
   );
@@ -71,8 +70,8 @@ function preprocess(emb)
   });
   let feedback = []
   let feedbackType = []
-  if (emb["keys3"]){
-    emb["keys3"].forEach(function(x, i){
+  if (emb["keys3"]) {
+    emb["keys3"].forEach(function (x, i) {
       feedback.push(emb["feedback"][x]);
       feedbackType.push(emb["feedbackType"][x]);
     })
@@ -118,15 +117,17 @@ function preprocess(emb)
 }
 
 function getquestion(t, id) {
-  fetch(serverUrl+'/api/worker/interactive/'+id)
+  console.log("getquestion!!!")
+  fetch(serverUrl + '/api/worker/interactive/' + id)
     .then(function (response) { return response.json(); })
     .then(function (response) {
       if (response.err !== undefined) {
-        Modal.error({content: response.err});
+        Modal.error({ content: response.err });
         return;
       }
-      
+
       let json = preprocess(response);
+      console.log("json", json)
 
       let questionSurveys;
       let questionFeedbacks;
@@ -140,7 +141,7 @@ function getquestion(t, id) {
           response.example,
           response.counterexample
         );
-      } else {       
+      } else {
         questionSurveys = addKeys(response.questionSurveys);
       }
       // Workaround: response.questionFeedbacks should not be undefined.
@@ -166,7 +167,7 @@ function getquestion(t, id) {
         );
       } else {
         questionSystems = addKeys(response.questionSystems);
-      }            
+      }
       t.setState({
         speech: json.speech,
         interface: json.interface,
@@ -184,13 +185,14 @@ function getquestion(t, id) {
         requirements: addKeys(response.requirements || []),
         hasFeedbackQuestion: response.hasFeedbackQuestion,
         style: response.style,
-        enableMarkdown: response.enableMarkdown
+        enableMarkdown: response.enableMarkdown,
+        systems: json.body
       });
     });
 }
 
 function SubmitFromUser(t, v, time) {
-  fetch(serverUrl+'/api/save/worker/interactive/'+t.state.userID, {
+  fetch(serverUrl + '/api/save/worker/interactive/' + t.state.userID, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -202,17 +204,77 @@ function SubmitFromUser(t, v, time) {
     .then(function (json) {
       console.log(json);
       if (json.success) {
-        confirm({
-          title: 'Thank you for submission',
-          content: 'Your survey code: ' + t.state.userID,
-          onOk() {
-          },
-          onCancel() {
-          },
+        // validate the dialogue quality based on rules
+        console.log("t.state", t.state)
+        let dialogueSystems = t.state.questionSystems;
+        let promises = [];
+
+        dialogueSystems.forEach(system => {
+          console.log("dialog_test", system)
+          const _p = new Promise((resolve, reject) => {
+            console.log("system name:", system.name);
+            fetch(serverUrl + '/api/validate/dialogue/' + t.state.subId + "/" + t.state.userID + "/" + system.name)
+              .then(function (response) {
+                return response.json();
+              }).then(function (data) {
+                resolve({ "system": system.name, "isPassed": data["isPassed"], "problems": data["problems"] });
+              });
+          });
+          promises.push(_p);
+        });
+
+        Promise.all(promises).then(data => {
+          let submissionProblem = [];
+          data.forEach(test => {
+            if (!test["isPassed"]) {
+              submissionProblem.push(test);
+            }
+          });
+
+          if (submissionProblem.length === 0) {
+            confirm({
+              title: 'Thank you for submission',
+              content: 'Your survey code: ' + t.state.userID,
+              onOk() {
+              },
+              onCancel() {
+              },
+            });
+          } else {
+            console.log("problem!!!")
+            let problemPromopt = [];
+            submissionProblem.forEach(problem => {
+              problemPromopt.push(problem["system"] + " has problems " + problem["problems"]);
+            });
+            confirm({
+              title: 'Sorry, there are issues with your submission',
+              content: problemPromopt.join("\n") + "\nWould you like to redo the assignment?",
+              onOk() {
+                window.location.reload();
+              },
+              onCancel() {
+                confirm({
+                  title: 'Sorry, there are issues with your submission',
+                  content: "Your assignment is unlikely to be accepted, would you like to continue?",
+                  onOk() {
+                    // submitToMturk(t, true);
+                  },
+                  onCancel() {
+                    window.location.reload();
+                  },
+                });
+              },
+            });
+          }
+
+          console.log("submissionProblem is:" + submissionProblem.length);
+
+        }).catch(err => {
+          console.log(err.toString())
+          console.log("Error!")
         });
       }
-      else
-      {
+      else {
         confirm({
           title: "Error",
           content: "You haven't talked to agents",
@@ -229,8 +291,10 @@ function SubmitFromUser(t, v, time) {
 
 class WorkerInteractive extends React.Component {
   talk_to_system = (system) => {
+    console.log("talk to system")
     let id = system.agent;
     let url = "";
+    // console.log(this.props)
 
     // lookup URL from the system list by matching the id.
     this.props.system.forEach(x => {
@@ -238,7 +302,7 @@ class WorkerInteractive extends React.Component {
         url = x["url"];
       }
     });
-    
+
     this.setState({
       chaturl: (
         `${clientUrl}/chat?`
@@ -263,17 +327,15 @@ class WorkerInteractive extends React.Component {
       var Id = params.ID;
       this.setState({ subId: Id });
     }
-    else
-    {
+    else {
       Id = "5aa2ea0f2972991520138bdb";
       this.setState({ subId: Id });
     }
-    console.log(Id);
     getquestion(this, Id);
   }
   onClose = () => {
     let systems = this.state.system_time;
-    systems.push({"system": this.state.current_system, "time": Date.now() - this.state.time})
+    systems.push({ "system": this.state.current_system, "time": Date.now() - this.state.time })
     this.setState({
       visible: false,
       system_time: systems
@@ -284,7 +346,7 @@ class WorkerInteractive extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        if (!this.state.isSubmit){
+        if (!this.state.isSubmit) {
           confirm({
             content: 'Please talk to the system before submission',
             onOk() {
@@ -293,7 +355,7 @@ class WorkerInteractive extends React.Component {
             },
           });
         }
-        else{
+        else {
           SubmitFromUser(this, values, this.state.system_time);
           console.log('Received values of form: ', values);
         }
@@ -302,7 +364,7 @@ class WorkerInteractive extends React.Component {
   }
 
   openInstructions = () => {
-    if (!(this.state.activeKey.includes("2"))){
+    if (!(this.state.activeKey.includes("2"))) {
       let x = this.state.activeKey;
       x.push("2");
       this.setState({
@@ -408,12 +470,12 @@ class WorkerInteractive extends React.Component {
         onClose={this.onClose}
         visible={this.state.visible}
       >
-        <Iframe style={{"margin-right": "10px"}} url={this.state.chaturl}
-                width="100%"
-                height="600"
-                display="initial"
-                position="relative"
-                allowFullScreen/>
+        <Iframe style={{ "margin-right": "10px" }} url={this.state.chaturl}
+          width="100%"
+          height="600"
+          display="initial"
+          position="relative"
+          allowFullScreen />
       </Drawer>
       <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }} >
         <Collapse defaultActiveKey={['1', '2']} activeKey={this.state.activeKey} onChange={this.changeTab}>
@@ -424,15 +486,15 @@ class WorkerInteractive extends React.Component {
               </Markdown>
             </p>
             <ConsentForm consent={this.state.consent}
-                         checkboxes={this.state.requirements} />
+              checkboxes={this.state.requirements} />
             {/* <AnonymityNotice /> */}
           </Panel>
           <Panel header="Instructions " key="2" style={styles.tabTitle}>
             <div style={styles.instruction}>
               {this.state.enableMarkdown ?
-               <Markdown enableMarkdown={this.state.enableMarkdown}>
-                 {this.state.instructions}
-               </Markdown> : <b>{this.state.instructions}</b>
+                <Markdown enableMarkdown={this.state.enableMarkdown}>
+                  {this.state.instructions}
+                </Markdown> : <b>{this.state.instructions}</b>
               }
             </div>
 
@@ -446,22 +508,24 @@ class WorkerInteractive extends React.Component {
             </p>
 
             {this.showSystemExamples(styles)}
-            
-            <div style={{...styles.example, "fontSize": styles.example.fontSize + 4}}>
+
+            <div style={{ ...styles.example, "fontSize": styles.example.fontSize + 4 }}>
               <p>Example Answers for General Questions:</p>
             </div>
             <Table rowKey="sentid" dataSource={this.state.questionSurveys}
-                   columns={columns} pagination={false}
-                   style={{...styles.example,
-                           marginTop: `${styles.global.spacing}px`,
-                           marginBottom: `${styles.global.spacing}px`}}
-                   size="small"/>
+              columns={columns} pagination={false}
+              style={{
+                ...styles.example,
+                marginTop: `${styles.global.spacing}px`,
+                marginBottom: `${styles.global.spacing}px`
+              }}
+              size="small" />
           </Panel>
           <Panel header="Interactive Tests " key="3" style={styles.tabTitle}>
             {!this.state.activeKey.includes("2") ?
-             <div style={{"textAlign": "center"}}>
-               <Button type="default" onClick={this.openInstructions}>Example Responses</Button>
-             </div> : null}
+              <div style={{ "textAlign": "center" }}>
+                <Button type="default" onClick={this.openInstructions}>Example Responses</Button>
+              </div> : null}
             {/*this.state.speech ?
                 <div title={"Audio Testing"} style={{ "margin-bottom": 0 }}  >
                 <FormItem {...formItemLayout2} label="Step1: Test your speakers. Please click " style={{ "margin-bottom": 0 }}  >
@@ -492,14 +556,18 @@ class WorkerInteractive extends React.Component {
             {this.state.questionSystems.map(
               (system) => (
                 <div key={system.key} title={system.name}
-                     style={{"border": "1px solid black", padding: 18 + styles.global.spacing,
-                             marginTop: `${12.5 + styles.global.spacing}px`}}
+                  style={{
+                    "border": "1px solid black", padding: 18 + styles.global.spacing,
+                    marginTop: `${12.5 + styles.global.spacing}px`
+                  }}
                 >
                   {/* Left column (for system). */}
-                  <div style={{"display": "inline-block", "width": "50%",
-                               "padding-left": "40px", "padding-right": "10px",
-                               "vertical-align": "top",
-                               color: styles.dialogInstruction.color}}>
+                  <div style={{
+                    "display": "inline-block", "width": "50%",
+                    "padding-left": "40px", "padding-right": "10px",
+                    "vertical-align": "top",
+                    color: styles.dialogInstruction.color
+                  }}>
                     <span > Instructions: </span>
                     <br />
                     <span className="ant-form-text" style={styles.dialogInstruction}>
@@ -509,59 +577,61 @@ class WorkerInteractive extends React.Component {
                     <span>{`Click to talk ${system.name}:`}</span>
                     {getFieldDecorator('username')(
                       <Button shape="circle" icon="message" size={"large"}
-                              style={{margin: "10px"}}
-                              onClick={() => this.talk_to_system(system)} />
+                        style={{ margin: "10px" }}
+                        onClick={() => this.talk_to_system(system)} />
                     )}
                   </div>
                   {/* Right column */}
-                  <div style={{...styles.question,
-                               "display": "inline-block", "width": "50%",
-                               "padding-right": "40px", "padding-left": "10px",
-                               "vertical-align": "top"}}>
+                  <div style={{
+                    ...styles.question,
+                    "display": "inline-block", "width": "50%",
+                    "padding-right": "40px", "padding-left": "10px",
+                    "vertical-align": "top"
+                  }}>
                     <QuestionList
                       getFieldDecorator={getFieldDecorator}
                       questions={system.questions}
                       title=""
                       borderStyle="none"
                       fieldPrefix={`Sub|||${system.name}|||`}
-                    />                        
+                    />
                   </div>
                 </div>
               )
             )}
 
-    { /* Survey questions. */ }
-    <div style={styles.question}>
-      <QuestionList
-        getFieldDecorator={getFieldDecorator}
-        questions={this.state.questionSurveys}
-        title="Survey"
-        systemNames={this.state.questionSystems.map((s) => (s.name))}
-        fieldPrefix="Exit"
-      />
-    </div>
+            { /* Survey questions. */}
+            <div style={styles.question}>
+              <QuestionList
+                getFieldDecorator={getFieldDecorator}
+                questions={this.state.questionSurveys}
+                title="Survey"
+                systemNames={this.state.questionSystems.map((s) => (s.name))}
+                fieldPrefix="Exit"
+              />
+            </div>
 
             {/* Feedback questions */}
-            <div style={{"backgroundColor": "#C1E7F8"}}>
+            <div style={{ "backgroundColor": "#C1E7F8" }}>
               <FormItem
-                style={{"textAlign": "center"}} wrapperCol={{span: 12, offset: 6}}
+                style={{ "textAlign": "center" }} wrapperCol={{ span: 12, offset: 6 }}
               >
                 {showFeedbackQuestion(this.state.hasFeedbackQuestion, getFieldDecorator)}
               </FormItem>
             </div>
-            <div style={{"text-align": "center"}}>
+            <div style={{ "text-align": "center" }}>
               <Button type="primary" htmlType="submit">Submit</Button>
             </div>
           </Panel>
         </Collapse>
-      </Form>    
+      </Form>
     </div>
   }
 
   showSystemExamples = (styles) => {
     /* Show the example answer and counterexample answers 
      * for system specific questions. */
-    
+
     // make data source for Antd Table
     let table = [];
     let lastSystem = undefined;
@@ -569,7 +639,7 @@ class WorkerInteractive extends React.Component {
       for (const question of system.questions) {
         // Add a row only when the question has an example/counterexample.
         if (question.examples.length > 0 ||
-            question.counterexamples.length > 0) {
+          question.counterexamples.length > 0) {
           // Don't show system if the name is same as the previous row.
           const systemName = system.name === lastSystem ? "" : system.name;
           table.push({
@@ -589,24 +659,29 @@ class WorkerInteractive extends React.Component {
 
     // columns for antd Table
     const columns = [
-      {title: "System", dataIndex: "system"},
-      {title: "Question", dataIndex: "question"},
-      {title: "Answer Examples", dataIndex: "examples",
-       render: _renderExamples},
-      {title: "Answer Counterexamples", dataIndex: "counterexamples",
-       render: _renderExamples}
+      { title: "System", dataIndex: "system" },
+      { title: "Question", dataIndex: "question" },
+      {
+        title: "Answer Examples", dataIndex: "examples",
+        render: _renderExamples
+      },
+      {
+        title: "Answer Counterexamples", dataIndex: "counterexamples",
+        render: _renderExamples
+      }
     ];
-    
+
     return <>
-      <div style={{...styles.example, "fontSize": styles.example.fontSize + 4}}>
+      <div style={{ ...styles.example, "fontSize": styles.example.fontSize + 4 }}>
         <p>Example Answers for System Specific Questions:</p>
       </div>
       <Table dataSource={table} columns={columns}
-             pagination={false} size="small"
-             style={{...styles.example,
-                     marginTop: `${styles.global.spacing}px`,
-                     /* marginBottom: `${styles.global.spacing}px` */
-             }}
+        pagination={false} size="small"
+        style={{
+          ...styles.example,
+          marginTop: `${styles.global.spacing}px`,
+          /* marginBottom: `${styles.global.spacing}px` */
+        }}
       />
     </>;
   }
@@ -617,20 +692,20 @@ function _renderExamples(examples, record) {
   return <ul>
     {examples.map((example, index) => (
       <li key={index}>
-        {example.content}          
+        {example.content}
         {example.explain !== undefined ?
-         <Tooltip title={example.explain}>
-        &nbsp; <sub><a>because...</a></sub>
-         </Tooltip> : null}
+          <Tooltip title={example.explain}>
+            &nbsp; <sub><a>because...</a></sub>
+          </Tooltip> : null}
       </li>
     ))}
   </ul>;
 }
 
 
-  function mapStateToProps(state, props) {
+function mapStateToProps(state, props) {
   return {
-        system:state.system,
+    system: state.system,
   }
 }
 
@@ -641,5 +716,5 @@ const mapDispatchToProps = {
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(Form.create()(WorkerInteractive));
-export {_renderExamples,};
+export { _renderExamples, };
 

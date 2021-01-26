@@ -28,5 +28,5 @@ app.use(function (req, res, next) {
 });
 
 server.listen(process.env.PORT || PORT, function () {
-  console.log("DialCrowd backend running on port " + (process.env.PORT || PORT))
+  console.log("DialCrowd backend running on port " + (process.env.PORT || PORT) + "(" + process.env.NODE_ENV + ")")
 });
