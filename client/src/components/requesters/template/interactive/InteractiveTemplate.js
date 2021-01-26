@@ -40,6 +40,8 @@ class InteractiveTemplate extends React.Component {
   }
 
   render() {
+    console.log("InteractiveTemplate.js")
+    console.log(this.props.thisstate)
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
       labelCol: {

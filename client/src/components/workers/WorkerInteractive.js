@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Collapse, Drawer, Form, Input, Modal, Radio, Rate, Table, Tooltip } from 'antd';
+import { Button, Collapse, Drawer, Form, Input, Modal, Radio, Rate, Table, Tooltip, Icon, Alert } from 'antd';
 import { clientUrl, serverUrl } from "../../configs";
 import { ConsentForm, AnonymityNotice } from "./AgreeModal";
 import queryString from 'query-string';
@@ -185,8 +185,7 @@ function getquestion(t, id) {
         requirements: addKeys(response.requirements || []),
         hasFeedbackQuestion: response.hasFeedbackQuestion,
         style: response.style,
-        enableMarkdown: response.enableMarkdown,
-        systems: json.body
+        enableMarkdown: response.enableMarkdown
       });
     });
 }
@@ -476,6 +475,23 @@ class WorkerInteractive extends React.Component {
           display="initial"
           position="relative"
           allowFullScreen />
+        <Alert
+          message="Say Bye"
+          description="Remember to say 'bye' to Dialogue System!"
+          type="info"
+          icon={<Icon type="smile" />}
+          showIcon={true}
+          closable
+        />
+        <Alert
+          message="Do not click Return"
+          description="It will terminate the task. To exit the dialogue, click the form again."
+          type="warning"
+          icon={<Icon type="close-circle" />}
+          showIcon={true}
+          closable
+        />
+
       </Drawer>
       <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }} >
         <Collapse defaultActiveKey={['1', '2']} activeKey={this.state.activeKey} onChange={this.changeTab}>

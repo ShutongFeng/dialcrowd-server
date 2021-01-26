@@ -1,18 +1,18 @@
-import React, {Component} from 'react'
-import {Button, Form, Icon, Input, message, Radio, Spin, Switch, Tooltip, Modal} from 'antd';
-import {connect} from "react-redux";
+import React, { Component } from 'react'
+import { Button, Form, Icon, Input, message, Radio, Spin, Switch, Tooltip, Modal, Table } from 'antd';
+import { connect } from "react-redux";
 import queryString from 'query-string';
-import {clientUrl, serverUrl} from "../../../../configs";
-import {loadData} from "../../../../actions/sessionActions";
-import {Message} from 'react-chat-ui';
-import {new_project_data} from "../../../../actions/crowdAction";
+import { clientUrl, serverUrl } from "../../../../configs";
+import { loadData } from "../../../../actions/sessionActions";
+import { Message } from 'react-chat-ui';
+import { new_project_data } from "../../../../actions/crowdAction";
 import InteractiveTemplate from "./InteractiveTemplate";
 import FileReaderInput from 'react-file-reader-input';
 import Configure from "../Configure.js"
-import {SurveyQuestionList, addKeys} from "../QuestionList.js"
+import { SurveyQuestionList, addKeys } from "../QuestionList.js"
 import PreviewButton from "./PreviewButton.js";
-import System, {lists2Systems} from "./System.js"
-import {saveAs} from 'file-saver';
+import System, { lists2Systems } from "./System.js"
+import { saveAs } from 'file-saver';
 
 
 const FormItem = Form.Item;
@@ -23,6 +23,27 @@ let feedback_index = 0;
 
 
 class InteractiveConfigure extends Configure {
+  handleFileInputChange(_, results, targetStateProperty) {
+    const [e, file] = results[0]
+    var data1 = []
+    var lines = e.target.result.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i] == "")
+        continue;
+      var dic = {};
+      dic["sentence"] = lines[i];
+      dic["sentid"] = i + 1;
+      dic["entity"] = []
+      data1.push(dic);
+    }
+    if (data1.length > 0) {
+      message.success(data1.length + ' tasks are loaded!');
+    }
+    this.setState({ [targetStateProperty]: data1 });
+    //console.log(this.state.cluster_data);
+
+  }
+
   static instructionSurvey = (
     "In this section, you can add, remove and edit questions regarding the "
     + "above systems. Different from the questions in the previous section, questions "
@@ -35,7 +56,7 @@ class InteractiveConfigure extends Configure {
     + "interactive agents. You can, for example, ask the worker to compare"
     + "the agents they have interacted with."
   );
-  
+
   constructor(props) {
     super(props);
     this.saveURL = '/api/save/task/interactive/';
@@ -45,8 +66,8 @@ class InteractiveConfigure extends Configure {
   componentDidMount() {
     this.makeProps();
   }
-  
-  makeProps() {    
+
+  makeProps() {
     if (this.props.session.questionSystems === undefined) {
       // Workaround
       let systems = lists2Systems(
@@ -57,10 +78,10 @@ class InteractiveConfigure extends Configure {
         this.props.session.dialog_examples,
         this.props.session.dialog_counterexamples,
       );
-      this.setState({"questionSystems": systems});
+      this.setState({ "questionSystems": systems });
     } else {
       this.setState(
-        {"questionSystems": addKeys(this.props.session.questionSystems)}
+        { "questionSystems": addKeys(this.props.session.questionSystems) }
       );
     }
     super.makeProps();
@@ -81,32 +102,95 @@ class InteractiveConfigure extends Configure {
     ];
     return (
       <div>
-        <h2 style={{"padding-left": "1%"}}>Template for an Interactive Task</h2>
-        <p style={{"padding-left": "1%"}}>This template is used for the creation of tasks that require the workers to interact with an agent.
+        <h2 style={{ "padding-left": "1%" }}>Template for an Interactive Task</h2>
+        <p style={{ "padding-left": "1%" }}>This template is used for the creation of tasks that require the workers to interact with an agent.
           You can have one or more agents for the workers to interact, and ask questions about those agents.</p>
-        {this.loading ? <Spin /> : 
-         <Form onSubmit={(e) => {this.handleSubmit(e)}}>
-           {this._showGeneralConfig()}
-           {this._showConsentConfig()}
-           {this._showSystemConfig()}
-           {this._showSurveyConfig()}
-           {this._showFeedbackConfig()}
-           {this._showAppearanceConfig(textStyleExtras)}
-           {this._showButtons()}
-         </Form>
+        {this.loading ? <Spin /> :
+          <Form onSubmit={(e) => { this.handleSubmit(e) }}>
+            {this._showGeneralConfig()}
+            {this._showDataUpload()}
+            {this._showConsentConfig()}
+            {this._showSystemConfig()}
+            {this._showSurveyConfig()}
+            {this._showFeedbackConfig()}
+            {this._showAppearanceConfig(textStyleExtras)}
+            {this._showButtons()}
+          </Form>
         }
       </div>
     );
   }
+  _showDataUpload(golden = false) {
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
+    let columns_dialog = [
+      {
+        title: 'ID',
+        dataIndex: 'sentid',
+        key: 'sendid',
+        width: 100,
+      },
+      {
+        title: 'Text',
+        dataIndex: 'sentence',
+        key: 'sentence',
+      },
+    ];
+    if (golden) {
+      columns_dialog.push({
+        title: 'Answer',
+        dataIndex: 'answer',
+        key: 'answer'
+      });
+    }
 
-  _showSurveyConfig () {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
-    const {instructionSurvey, helpTextSurveyQuestion} = this.constructor;
+    const explain = golden ? (<>
+      <div>
+        Please format your data as below, separated with new lines:
+      </div>
+      <div>"taskID":1, "tasks":["Cons": "area=south"]</div>
+      <div>...</div>
+    </>) : 'Please split the tasks by new line.';
+    const targetStateProperty = golden ? 'dataGolden' : 'category_data';
+
+    return (<>
+      <FormItem
+        {...formItemLayout}
+        label={(
+          <span>
+            Upload your data&nbsp;
+            <Tooltip title={explain}>
+              <Icon type="question-circle-o" />
+            </Tooltip>
+          </span>
+        )}
+      >
+        <FileReaderInput
+          as='text'
+          onChange={(e, results) => this.handleFileInputChange(e, results, targetStateProperty)}
+        >
+          <Button
+            style={{ width: '90%' }}
+          >
+            <Icon type='upload' /> Click to Upload
+          </Button>
+        </FileReaderInput>
+      </FormItem>
+
+      {(this.state[targetStateProperty] || []).length > 0 ? <div height={500}>
+        <Table rowKey="sentence" dataSource={this.state[targetStateProperty]} columns={columns_dialog} pagination={{ hideOnSinglePage: true }} size="small" />
+      </div> : null
+      }
+    </>);
+  }
+
+  _showSurveyConfig() {
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
+    const { instructionSurvey, helpTextSurveyQuestion } = this.constructor;
     return (<>
       {/* Surveys */}
-      <h3 style={{"padding-left": "1%"}}>General Questions</h3>
-      <p style={{"padding-left": "1%"}}>{instructionSurvey}</p>
+      <h3 style={{ "padding-left": "1%" }}>General Questions</h3>
+      <p style={{ "padding-left": "1%" }}>{instructionSurvey}</p>
       <SurveyQuestionList
         form={this.props.form}
         formItemLayout={formItemLayout}
@@ -128,10 +212,10 @@ class InteractiveConfigure extends Configure {
     </>);
   }
 
-  
-  _showSystemConfig () {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+
+  _showSystemConfig() {
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     const instructionSystem = (
       "In this section, you can add, remove and edit the interactive agents you want "
       + "the workers interact with. For each system, you can set up one or more "
@@ -143,8 +227,8 @@ class InteractiveConfigure extends Configure {
     );
     return (<>
       {/* Systems. */}
-      <h3 style={{"padding-left": "1%"}}>Interactive Agents</h3>
-      <p style={{"padding-left": "1%"}}> {instructionSystem} </p>
+      <h3 style={{ "padding-left": "1%" }}>Interactive Agents</h3>
+      <p style={{ "padding-left": "1%" }}> {instructionSystem} </p>
       <System
         form={this.props.form}
         formItemLayout={formItemLayout}
@@ -159,8 +243,8 @@ class InteractiveConfigure extends Configure {
     </>);
   }
 
-  _showTemplate () {
-    return <InteractiveTemplate thisstate={this.props.session}/>;
+  _showTemplate() {
+    return <InteractiveTemplate thisstate={this.props.session} />;
   }
 
 };

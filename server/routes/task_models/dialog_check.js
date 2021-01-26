@@ -35,7 +35,7 @@ function dialogueTest(dialogueArray) {
                 });
             } else {
                 // End dialogue: You can now hang up.
-                if (utter["utter"].includes("You can now hang up")) {
+                if (utter["utter"].includes("You can now hang up") || utter["utter"].includes("bye")) {
                     isEnd = true;
                 }
 
