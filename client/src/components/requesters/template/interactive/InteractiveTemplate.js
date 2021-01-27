@@ -150,7 +150,7 @@ class InteractiveTemplate extends React.Component {
                                     <p style={{"margin-left": "40px"}}>&lt;button id="submit"&gt;Generate Link&lt;/button&gt;</p>
                                 <p style={{"margin-left": "20px"}}>&lt;/div&gt;</p>
                                 <p style={{"margin-left": "20px"}}>&lt;br&gt;</p>
-                                <p style={{"margin-left": "20px"}}>&lt;div&gt;&lt;span id="dialcrowd_link"&gt;&lt;/span&gt;&lt;/div&gt;</p>
+                                <p style={{"margin-left": "20px"}}>&lt;div&gt;&lt;span id="dialcrowd_link"&gt; - &lt;/span&gt;&lt;/div&gt;</p>
 
                                 <p style={{"margin-left": "20px"}}>&lt;script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"&gt;&lt;/script&gt;</p>
                                 <p style={{"margin-left": "20px"}}>&lt;script&gt;</p>
