@@ -41,6 +41,7 @@ class ProjectList extends React.Component {
     const response = await rawResponse.json();
     // `response` will be null if the password is incorrect.
     if (response !== null) {
+      response.password = this.state.password;
       await this.props.dispatchUpdate(this.props.url, response);
       // hide modal
       this.setState({loading: false, visible: false, password: ""});
