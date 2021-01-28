@@ -326,12 +326,13 @@ class WorkerInteractive extends React.Component {
         url = x["url"];
       }
     });
-
+    console.log("talk_to_system_taskID", this.state.taskID)
     this.setState({
       chaturl: (
         `${clientUrl}/chat?`
         + `option=${this.state.interface}&ip=${url}&userID=${this.state.userID}`
         + `&subId=${this.state.subId}&name_of_dialog=${system.name}`
+        + `&taskID=${this.state.taskID}`
         + `&help=${system.instruction}`
       ),
       current_system: system.name,

@@ -264,10 +264,11 @@ router.post('/dialog_save', function (req, res, next) {
   const subId = req.body.subId;
   const userID = req.body.userID;
   const name_of_dialog = req.body.name_of_dialog;
+  const taskID = req.body.taskID;
   const role = req.body.role;
   const utter = req.body.utter;
 
-  interactive_resultcollection.findOne({ userID: userID, name_of_dialog: name_of_dialog }, function (err, results) {
+  interactive_resultcollection.findOne({ userID: userID, name_of_dialog: name_of_dialog, taskID: taskID }, function (err, results) {
     if (err) {
       res.status(400).json({ err: 'err' })
     }
@@ -275,7 +276,7 @@ router.post('/dialog_save', function (req, res, next) {
       if (results) {
         let query = { $push: {} };
         query["$push"]["dialog"] = { "role": role, "utter": utter };
-        interactive_resultcollection.update({ userID: userID, name_of_dialog: name_of_dialog }, query, function (err, updateResult) {
+        interactive_resultcollection.update({ userID: userID, name_of_dialog: name_of_dialog, taskID: taskID }, query, function (err, updateResult) {
           if (err) {
             return res.send(err);
           }
@@ -288,7 +289,7 @@ router.post('/dialog_save', function (req, res, next) {
         });
       }
       else {
-        let query = { subId: subId, userID: userID, name_of_dialog: name_of_dialog, feedback: [], dialog: [{ role: role, utter: utter }] }
+        let query = { subId: subId, userID: userID, name_of_dialog: name_of_dialog, feedback: [], taskID: taskID, dialog: [{ role: role, utter: utter }] }
         interactive_resultcollection.insert(query, function (err, updateResult) {
           if (err) {
             return res.send(err);
