@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Collapse, Drawer, Form, Input, Modal, Radio, Rate, Table, Tooltip, Icon, Alert } from 'antd';
+import { Button, Collapse, Drawer, Form, Input, Modal, Radio, Rate, Table, Tooltip, Icon, Alert, Row, Col, Card } from 'antd';
 import { clientUrl, serverUrl } from "../../configs";
 import { ConsentForm, AnonymityNotice } from "./AgreeModal";
 import queryString from 'query-string';
@@ -117,7 +117,7 @@ function preprocess(emb) {
 }
 
 function getquestion(t, id) {
-  console.log("getquestion!!!")
+
   fetch(serverUrl + '/api/worker/interactive/' + id)
     .then(function (response) { return response.json(); })
     .then(function (response) {
@@ -168,6 +168,7 @@ function getquestion(t, id) {
       } else {
         questionSystems = addKeys(response.questionSystems);
       }
+      console.log("json.instructions", json.instructions)
       t.setState({
         speech: json.speech,
         interface: json.interface,
@@ -189,6 +190,30 @@ function getquestion(t, id) {
       });
     });
 }
+
+function getInteractiveTask(t, id) {
+  fetch(serverUrl + '/api/get_interactive_task/' + id)
+    .then(function (response) { return response.json(); })
+    .then(function (json) {
+      let task = JSON.parse(json["task"]);
+
+      t.setState({
+        current_task: task,
+        taskList: task.tasks,
+        taskID: task.taskID
+      })
+      console.log("getInteractiveTask", t.state.taskID)
+    })
+}
+
+// Set cookies in order to pass the task to later interactive worker page.
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires=" + d.toGMTString();
+  document.cookie = cname + "=" + cvalue + "; " + expires + ";domain=" + window.location.hostname + ";path=/";
+}
+
 
 function SubmitFromUser(t, v, time) {
   fetch(serverUrl + '/api/save/worker/interactive/' + t.state.userID, {
@@ -331,6 +356,7 @@ class WorkerInteractive extends React.Component {
       this.setState({ subId: Id });
     }
     getquestion(this, Id);
+    getInteractiveTask(this, Id);
   }
   onClose = () => {
     let systems = this.state.system_time;
@@ -413,7 +439,10 @@ class WorkerInteractive extends React.Component {
       questionSurveys: [],
       questionFeedbacks: [],
       questionSystems: [],
-      requirements: []
+      requirements: [],
+      current_task: [],
+      taskID: "",
+      taskList: []
     };
   }
 
@@ -460,6 +489,7 @@ class WorkerInteractive extends React.Component {
         fontSize: 18
       }
     });
+    console.log("render", this.state.current_task)
 
     return <div style={styles.global}>
       <Drawer
@@ -537,7 +567,33 @@ class WorkerInteractive extends React.Component {
               }}
               size="small" />
           </Panel>
-          <Panel header="Interactive Tests " key="3" style={styles.tabTitle}>
+          <Panel header="Dialogue Task" key="3" style={styles.tabTitle}>
+            <div style={{ background: '#ECECEC', padding: '30px' }}>
+
+              <Row gutter={16}>
+                {
+                  this.state.taskList.map(item =>
+                    <Col span={6}>
+                      <Card title={item.Dom} bordered={false} headStyle={{ size: 20, "text-align": "center" }}
+                        bodyStyle={{ size: 10, "text-align": "center" }}>
+                        <p><b>Condition</b></p>
+                        {item.Cons.split(",").map(x =>
+                          <p>{x}</p>
+                        )}
+                        <p></p>
+                        <p><b>Please Ask</b></p>
+                        {item.Reqs.split(",").map(x =>
+                          <p>{x}</p>
+                        )}
+                      </Card>
+                    </Col>
+                  )
+                }
+              </Row>
+            </div>
+
+          </Panel>
+          <Panel header="Interactive Tests " key="4" style={styles.tabTitle}>
             {!this.state.activeKey.includes("2") ?
               <div style={{ "textAlign": "center" }}>
                 <Button type="default" onClick={this.openInstructions}>Example Responses</Button>

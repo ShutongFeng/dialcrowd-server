@@ -23,6 +23,20 @@ let feedback_index = 0;
 
 
 class InteractiveConfigure extends Configure {
+  handleSubmit = (e) => {
+    /* Called when the submit button is clicked. */
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        values["interactive_task_data"] = this.state.interactive_task_data
+        values["consent"] = this.state.consent;
+        this.submit(values, this.props.session._id);
+      }
+      else {
+        console.log(err);
+      }
+    });
+  };
   handleFileInputChange(_, results, targetStateProperty) {
     const [e, file] = results[0]
     var data1 = []
@@ -59,6 +73,10 @@ class InteractiveConfigure extends Configure {
 
   constructor(props) {
     super(props);
+    this.state = {
+      ...this.state,
+      interactive_task_data: [],
+    }
     this.saveURL = '/api/save/task/interactive/';
     this.taskName = 'interactive';
   }
@@ -84,6 +102,9 @@ class InteractiveConfigure extends Configure {
         { "questionSystems": addKeys(this.props.session.questionSystems) }
       );
     }
+    this.setState({
+      interactive_task_data: this.props.session.interactive_task_data
+    });
     super.makeProps();
   };
 
@@ -108,7 +129,7 @@ class InteractiveConfigure extends Configure {
         {this.loading ? <Spin /> :
           <Form onSubmit={(e) => { this.handleSubmit(e) }}>
             {this._showGeneralConfig()}
-            {this._showDataUpload()}
+            {this._showDataConfig()}
             {this._showConsentConfig()}
             {this._showSystemConfig()}
             {this._showSurveyConfig()}
@@ -119,6 +140,21 @@ class InteractiveConfigure extends Configure {
         }
       </div>
     );
+  }
+  _showDataConfig() {
+    const { formItemLayout } = this;
+    return (<>
+      <h3 style={{ "padding-left": "1%" }}>Task</h3>
+      <p style={{ "padding-left": "1%" }}>The Tasks you want the workers to follow.</p>
+      <div style={{
+        border: "2px solid black",
+        margin: "10px",
+        padding: 24
+      }}>
+        {this._showDataUpload(false)}
+      </div>
+
+    </>);
   }
   _showDataUpload(golden = false) {
     const { formItemLayout, formItemLayoutWithOutLabel } = this;
@@ -150,7 +186,7 @@ class InteractiveConfigure extends Configure {
       <div>"taskID":1, "tasks":["Cons": "area=south"]</div>
       <div>...</div>
     </>) : 'Please split the tasks by new line.';
-    const targetStateProperty = golden ? 'dataGolden' : 'category_data';
+    const targetStateProperty = golden ? 'dataGolden' : 'interactive_task_data';
 
     return (<>
       <FormItem
@@ -180,6 +216,7 @@ class InteractiveConfigure extends Configure {
         <Table rowKey="sentence" dataSource={this.state[targetStateProperty]} columns={columns_dialog} pagination={{ hideOnSinglePage: true }} size="small" />
       </div> : null
       }
+
     </>);
   }
 

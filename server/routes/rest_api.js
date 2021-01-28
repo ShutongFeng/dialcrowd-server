@@ -1349,4 +1349,31 @@ router.get('/validate/dialogue/:task_id/:user_id/:bot_name', function (req, res,
   })
 });
 
+function randomSelect(list) {
+  return list[Math.floor(Math.random() * list.length)]
+}
+
+router.get('/get_interactive_task/:task_id', function (req, res, next) {
+  task_id = req.params.task_id;
+  console.log("Interactive Tasks: " + task_id);
+  let collection = interactive_collection;
+  collection.findOne({ '_id': mongojs.ObjectID(task_id) }, function (err, task) {
+    if (err) {
+      res.send(err)
+    } else {
+
+      let obj = JSON.parse(JSON.stringify(task));
+      //console.log(obj);
+      let taskList = obj["interactive_task_data"];
+      console.log("taskList", taskList);
+
+      let currentTask = randomSelect(taskList);
+      console.log("current task", currentTask)
+
+
+      res.json({ "task": currentTask["sentence"] });
+    }
+  })
+});
+
 module.exports = router;
