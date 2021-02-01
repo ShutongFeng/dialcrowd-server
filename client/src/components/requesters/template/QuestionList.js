@@ -312,52 +312,54 @@ class QuestionList extends React.Component {
         <br/>
         
         {/* Examples. */}
-        {question.examples === undefined ? null :
-         <DynamicItems
-           form={this.props.form}
-           formItemLayout={this.props.formItemLayout}
-           removeByKey={this.props.removeByKey}
-           addByKey={this.props.addByKey}
-           updateByKey={this.props.updateByKey}
-           rootKeys={this.props.rootKey.concat([question.key, "examples"])}
-           items={question.examples}
-           title="Example and Explanation"
-           textHelp={(
-             "Please provide an example of an answer to your question above. "
-             + "It helps the worker understand what is an acceptable answer, "
-             + "and thus ensures better quality of your collected data."
-           )}
-           textAdd="Add an example"
-           placeholder={this.props.placeholderExample}
-           placeholderExplain="Why is this example well done?"
-           recommendedNumber={3}
-         />
-        }
+        <DynamicItems
+          form={this.props.form}
+          formItemLayout={this.props.formItemLayout}
+          removeByKey={this.props.removeByKey}
+          addByKey={this.props.addByKey}
+          updateByKey={this.props.updateByKey}
+          rootKeys={this.props.rootKey.concat([question.key, "examples"])}
+          items={question.examples || []}
+          title="Example and Explanation"
+          textHelp={(
+            "Please provide an example of an answer to your question above. "
+              + "It helps the worker understand what is an acceptable answer, "
+              + "and thus ensures better quality of your collected data."
+          )}
+          textAdd="Add an example"
+          placeholder={this.props.placeholderExample}
+          placeholderExplain="Why is this example well done?"
+          recommendedNumber={3}
+          recommendedMinNumber={1}
+          required={question.type === 'Open ended'}
+          minimumNumber={question.type === 'Open ended' ? 1 : 0}
+        />
 
         <br/>
         <hr/>
         <br/>
         
-        {question.counterexamples === undefined ? null :
-         <DynamicItems
-           form={this.props.form}
-           formItemLayout={this.props.formItemLayout}
-           removeByKey={this.props.removeByKey}
-           addByKey={this.props.addByKey}
-           updateByKey={this.props.updateByKey}
-           rootKeys={this.props.rootKey.concat([question.key, "counterexamples"])}
-           items={question.counterexamples}
-           title="Counterexample and Explanation"
-           textHelp={("Please provide an counterexample of an answer to your question above. "
-                    + "It helps the worker understand what answers are unacceptable, "
-                    + "and thus reduces low quality responses in your collected data."
-           )}
-           textAdd="Add a counterexample"
-           placeholder={this.props.placeholderCounterexample}
-           placeholderExplain="Why is this example badly done?"
-           recommendedNumber={3}
-         />
-        }
+        <DynamicItems
+          form={this.props.form}
+          formItemLayout={this.props.formItemLayout}
+          removeByKey={this.props.removeByKey}
+          addByKey={this.props.addByKey}
+          updateByKey={this.props.updateByKey}
+          rootKeys={this.props.rootKey.concat([question.key, "counterexamples"])}
+          items={question.counterexamples || []}
+          title="Counterexample and Explanation"
+          textHelp={("Please provide an counterexample of an answer to your question above. "
+                     + "It helps the worker understand what answers are unacceptable, "
+                     + "and thus reduces low quality responses in your collected data."
+                    )}
+          textAdd="Add a counterexample"
+          placeholder={this.props.placeholderCounterexample}
+          placeholderExplain="Why is this example badly done?"
+          recommendedNumber={3}
+          recommendedMinNumber={1}
+          required={question.type === 'Open ended'}
+          minimumNumber={question.type === 'Open ended' ? 1 : 0}
+        />
       </>
     );
   }
@@ -443,12 +445,17 @@ class DynamicItems extends React.Component {
    * @{int} minimumNumber: Default 1.
    */
   constructor (props) {
-    super(props);    
+    super(props);
+    this.styleWarning = {
+      'width': '90%', 'color': 'darkorange',
+      'text-align': 'center',
+      'font-weight': 'bold'
+    };
   }
   
   render () {
     const {fields, rootKeys, placeholder, placeholderExplain, textHelp,
-           recommendedNumber, textAdd, items, title} = this.props;
+           recommendedNumber, recommendedMinNumber, textAdd, items, title} = this.props;
     const formItemLayoutWithOutLabel = {
       wrapperCol: {
         xs: {span: 24, offset: 0},
@@ -458,6 +465,7 @@ class DynamicItems extends React.Component {
     /* Show dynamic fields, and the adding button as well. */
     return (
       <>
+
         {/* The dynamic fields. */}
         <Form.Item
           {...(this.props.formItemLayout)}
@@ -469,8 +477,18 @@ class DynamicItems extends React.Component {
                 <Icon type="question-circle-o"/>
               </Tooltip>
             </span>)}
-          required={true}
+          required={this.props.required !== undefined ? this.props.required : true}
         >
+          {/* Warning message when the number of fields is too few. */}
+          {
+            (recommendedMinNumber !== undefined && items.length < recommendedMinNumber) ?
+              <span style={this.styleWarning}>
+                <ExclamationCircleOutlined />
+                &nbsp;
+                Having at least {recommendedMinNumber} example is recommended.
+              </span> : null
+          }
+
           { this._showDynamicInputs(items, rootKeys, placeholder, placeholderExplain) }
         </Form.Item>
 
@@ -490,6 +508,7 @@ class DynamicItems extends React.Component {
               Adding more than {recommendedNumber} examples is not recommended.
             </div> : null
           }
+          
         </Form.Item>
       </>
     );
@@ -582,7 +601,7 @@ class DynamicItems extends React.Component {
       }
 
       // show remove button
-      if (fields.length > this.props.minimumNumber || 1) {
+      if (fields.length > (this.props.minimumNumber === undefined ? 1 : this.props.minimumNumber)) {
         children.push(
           <Tooltip>
             <a onClick={

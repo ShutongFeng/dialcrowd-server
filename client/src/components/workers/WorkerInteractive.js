@@ -711,15 +711,15 @@ class WorkerInteractive extends React.Component {
     for (const system of this.state.questionSystems) {
       for (const question of system.questions) {
         // Add a row only when the question has an example/counterexample.
-        if (question.examples.length > 0 ||
-          question.counterexamples.length > 0) {
+        if ((question.examples || []).length > 0 ||
+          (question.counterexamples || []).length > 0) {
           // Don't show system if the name is same as the previous row.
           const systemName = system.name === lastSystem ? "" : system.name;
           table.push({
             system: systemName,
             question: question.title,
-            examples: question.examples,
-            counterexamples: question.counterexamples
+            examples: question.examples || [],
+            counterexamples: question.counterexamples || []
           })
         }
       }
@@ -763,7 +763,7 @@ class WorkerInteractive extends React.Component {
 
 function _renderExamples(examples, record) {
   return <ul>
-    {examples.map((example, index) => (
+    {(examples || []).map((example, index) => (
       <li key={index}>
         {example.content}
         {example.explain !== undefined ?

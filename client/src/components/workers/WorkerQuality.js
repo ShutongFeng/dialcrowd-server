@@ -231,21 +231,6 @@ class WorkerQuality extends React.Component {
   render() {
     const {current} = this.state;
 
-    const columns_example = [{
-      title: 'Question',
-      dataIndex: 'title',
-    }, {
-      title: 'An Example Response',
-      dataIndex: 'examples',
-      key: 'examples',
-      render: _renderExamples
-    }, {
-      title: 'A Counterexample Response',
-      dataIndex: 'counterexamples',
-      key: 'counterexamples',
-      render: _renderExamples
-    }];
-
     const { getFieldDecorator } = this.props.form;
     const formItemLayout2 = {
       labelCol: { span: 10 },
@@ -295,12 +280,16 @@ class WorkerQuality extends React.Component {
         "margin-bottom": `${styles.global.spacing}px`,
         fontSize: styles.instruction.fontSize - 2
       }}>
-        We expect this HIT will take <b>{this.state.time} minute(s)</b> and we will pay <b>${this.state.payment}</b>.
-      </span>
-      <div style={{...styles.example, "fontSize": styles.example.fontSize + 4}}>
-        <b>Examples</b>
-      </div>
-      <Table rowKey="sentid" dataSource={this.state.questionSurveys} columns={columns_example} size="small" pagination={{hideOnSinglePage: true}} style={styles.example} />
+    We expect this HIT will take <b>{this.state.time} minute(s)</b> and we will pay <b>${this.state.payment}</b>.
+                                                                                                          </span>
+    {
+      showExamples(
+        this.state.questionSurveys,
+        styles,
+        {...styles.example, "fontSize": styles.example.fontSize + 4}
+      )
+    }
+      
     </Collapse.Panel>
     
     <Collapse.Panel header="Quality Questions" key="3" style={styles.tabTitle}>
@@ -387,5 +376,41 @@ class WorkerQuality extends React.Component {
   }
 }
 
+function showExamples(questions, styles, titleStyle) {
+  const columns_example = [{
+    title: 'Question',
+    dataIndex: 'title',
+  }, {
+    title: 'An Example Response',
+    dataIndex: 'examples',
+    key: 'examples',
+    render: _renderExamples
+  }, {
+    title: 'A Counterexample Response',
+    dataIndex: 'counterexamples',
+    key: 'counterexamples',
+    render: _renderExamples
+  }];
+
+  const dsExamples = (questions || []).filter(
+    q => (q.examples || []).length > 0 || (q.counterexamples || []).length > 0
+  );
+  if (dsExamples.length === 0) {
+    return null;
+  } else {
+    return (<> 
+      <div style={titleStyle}>
+        <b>Examples</b>
+      </div>
+      <Table rowKey="sentid"
+             dataSource={dsExamples}
+             columns={columns_example}
+             size="small"
+             pagination={{hideOnSinglePage: true}}
+             style={styles.example} />
+    </>);
+  }
+}
 
 export default Form.create()(WorkerQuality)
+export {showExamples};

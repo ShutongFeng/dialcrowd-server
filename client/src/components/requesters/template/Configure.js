@@ -178,7 +178,11 @@ class Configure extends Component {
           }
         }
       } else {
-        node = shallowCopy(node[key]);
+        if (node[key] !== undefined) {
+          node = shallowCopy(node[key]);
+        } else {
+          node = [];
+        }
         path[path.length - 1][key] = node;
       }
       path.push(node);
