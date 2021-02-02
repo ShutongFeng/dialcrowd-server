@@ -1,5 +1,7 @@
 import React from "react";
-import { Button, Drawer, Form, Icon, Input, Row, Tabs } from 'antd'
+import { Button, Drawer, Form, Icon, Input, Row, Tabs } from 'antd';
+import { clientUrl } from '../../../../configs';
+
 
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
@@ -100,7 +102,7 @@ class InteractiveTemplate extends React.Component {
                     </Form>
 
                     {this.state.showlink ?
-                      <p>Please go to https://dialeval.cs.hhu.de/worker_interactive?MID={this.state.username}&ID={this.props.thisstate._id} in a separate window to complete the HIT</p>
+                      <p>Please go to {clientUrl}/worker_interactive?MID={this.state.username}&ID={this.props.thisstate._id} in a separate window to complete the HIT</p>
                       : null}
                     <br></br>
                     <p>When you are done, input the confirmation code here: <input type="text" style={{ "border": "1px solid gray", "padding-left": "5px" }} /></p>
@@ -158,7 +160,7 @@ class InteractiveTemplate extends React.Component {
                       <p style={{ "margin-left": "20px" }}>&lt;script&gt;</p>
                       <p style={{ "margin-left": "40px" }}>document.getElementById('submit').onclick = function(event) {"{"}</p>
                       <p style={{ "margin-left": "60px" }}>event.preventDefault();</p>
-                      <p style={{ "margin-left": "60px" }}>document.getElementById("dialcrowd_link").textContent = "Please go to https://cmu-dialcrowd.herokuapp.com/worker_interactive/?ID=5f0b6fe49878971ce8ab83c9&MID=" + document.getElementById("workerid").value + " in a separate window to complete the HIT"</p>
+                      <p style={{ "margin-left": "60px" }}>document.getElementById("dialcrowd_link").textContent = "Please go to {clientUrl}/worker_interactive/?ID=5f0b6fe49878971ce8ab83c9&MID=" + document.getElementById("workerid").value + " in a separate window to complete the HIT"</p>
                       <p style={{ "margin-left": "40px" }}>{"}"}</p>
                       <p style={{ "margin-left": "20px" }}>&lt;/script&gt;</p>
 
