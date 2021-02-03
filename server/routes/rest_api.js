@@ -1241,10 +1241,10 @@ router.post('/router/chat/usr_input', function (req, res, next) {
     url = server_url.replace("%s", "init");
     payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
   }
-  // else if ("bye" == usr_input.toLowerCase().trim()) {
-  //   url = server_url.replace("%s", "end");
-  //   payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
-  // }
+  else if ("bye" == usr_input.toLowerCase().trim()) {
+    url = server_url.replace("%s", "end");
+    payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
+  }
   else if (!(cli_manager.get_active(session_id))) {
     res.send({ "action": 'status', "msg": "Please type or say START to begin." });
     return;
