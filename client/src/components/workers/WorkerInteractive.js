@@ -171,7 +171,7 @@ function getquestion(t, id) {
       console.log("json.instructions", json.instructions)
       t.setState({
         speech: json.speech,
-        interface: json.interface,
+        interface: response.interface,
         intro: json.intro,
         instructions: json.instructions,
         feedback: json.feedback,
