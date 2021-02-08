@@ -1351,6 +1351,9 @@ router.get('/validate/dialogue/:task_id/:user_id/:bot_name', function (req, res,
 });
 
 function randomSelect(list) {
+  if (typeof (list) == "undefined") {
+    return ""
+  }
   return list[Math.floor(Math.random() * list.length)]
 }
 
@@ -1368,7 +1371,8 @@ router.get('/get_interactive_task/:task_id', function (req, res, next) {
       let taskList = obj["interactive_task_data"];
       console.log("taskList", taskList);
 
-      let currentTask = randomSelect(taskList);
+      let currentTask = []
+      if (typeof (taskList) != "undefined") { currentTask = randomSelect(taskList); }
       console.log("current task", currentTask)
 
 

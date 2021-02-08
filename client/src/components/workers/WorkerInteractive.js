@@ -202,7 +202,7 @@ function getInteractiveTask(t, id) {
         taskList: task.tasks,
         taskID: task.taskID
       })
-      console.log("getInteractiveTask", t.state.taskID)
+      console.log("getInteractiveTask", t.state.taskID, t.state.taskList)
     })
 }
 
@@ -525,7 +525,7 @@ class WorkerInteractive extends React.Component {
 
       </Drawer>
       <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }} >
-        <Collapse defaultActiveKey={['1', '2']} activeKey={this.state.activeKey} onChange={this.changeTab}>
+        <Collapse defaultActiveKey={['1', '2', '3']} activeKey={this.state.activeKey} onChange={this.changeTab}>
           <Panel header="Background " key="1" style={styles.tabTitle}>
             <p style={styles.background}>
               <Markdown enableMarkdown={this.state.enableMarkdown}>
