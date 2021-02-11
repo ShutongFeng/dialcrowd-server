@@ -1,4 +1,4 @@
 module.exports = {
   // mongoURI: 'mongodb+srv://dialcrowd:password@cluster0.xxx.mongodb.net/dialcrowd?retryWrites=true'
-  mongoURI: 'mongodb://127.0.0.1:27017'
+  mongoURI: 'mongodb://34.76.192.20:27027'
 };
