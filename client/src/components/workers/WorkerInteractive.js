@@ -552,7 +552,7 @@ class WorkerInteractive extends React.Component {
               marginBottom: '0px',
               fontSize: styles.instruction.fontSize - 2
             }}>
-              We expect this HIT will take <b>{this.state.timepay} minute(s)</b> and we will pay <b>${this.state.payment}</b>.
+              We expect this HIT will take <b>{this.state.timepay} minute(s)</b> and we will pay <b>${this.state.payment}</b> (USD).
             </p>
 
             {this.showSystemExamples(styles)}
