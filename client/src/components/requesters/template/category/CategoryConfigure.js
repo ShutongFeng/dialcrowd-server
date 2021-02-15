@@ -1,17 +1,15 @@
-import React, {Component} from 'react';
-import {Button, Form, Icon, Input, InputNumber, message, Modal, Switch, Table, Tooltip} from 'antd';
-import {connect} from "react-redux";
+import React from 'react';
+import { Button, Form, InputNumber, message, Table, Tooltip } from 'antd';
+import { QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons'
+import { connect } from "react-redux";
 import 'react-datasheet/lib/react-datasheet.css';
 import FileReaderInput from 'react-file-reader-input';
-import CategoryLabel from "./CategoryLabel";
-import {clientUrl, serverUrl} from "../../../../configs";
-import {loadData} from "../../../../actions/sessionActions";
-import {new_project_data} from "../../../../actions/crowdAction";
-import CategoryFeedbackLabel from "./CategoryFeedbackLabel";
+import { clientUrl, serverUrl } from "../../../../configs";
+import { loadData } from "../../../../actions/sessionActions";
+import { new_project_data } from "../../../../actions/crowdAction";
 import CategoryTemplate from "./CategoryTemplate";
 import Configure from "../Configure.js"
-import QuestionList, {addKeys, lists2Questions} from "../QuestionList.js";
-import {saveAs} from 'file-saver';
+import QuestionList, { addKeys, lists2Questions } from "../QuestionList.js";
 
 
 const FormItem = Form.Item;
@@ -52,22 +50,22 @@ function get_category_results(t) {
       var responses = [];
       var sentence_ids = [];
       let grid = [];
-      let row = [{readOnly: true, value: ''}]
+      let row = [{ readOnly: true, value: '' }]
       Object.keys(json.kappa).forEach(x => {
-        row.push({value: x, readOnly: true})
+        row.push({ value: x, readOnly: true })
       });
       grid.push(row);
       Object.keys(json.kappa).forEach(user1 => {
-        let row = [{readOnly: true, value: user1}];
+        let row = [{ readOnly: true, value: user1 }];
         Object.keys(json.kappa).forEach(user2 => {
-          row.push({value: json.kappa[user1][user2]})
+          row.push({ value: json.kappa[user1][user2] })
         });
         grid.push(row);
       });
       console.log(grid);
 
-      json.response.forEach(function(data, index){
-        if (!sentence_ids.includes(data.sentid)){
+      json.response.forEach(function (data, index) {
+        if (!sentence_ids.includes(data.sentid)) {
           sentence_ids.push(data.sentid);
           responses.push(data);
         }
@@ -121,14 +119,14 @@ class CategoryConfigure extends Configure {
         dic["sentence"] = lines[i];
         dic["sentid"] = i + 1;
         dic["answer"] = lines[i + 1];
-        data1.push(dic);        
+        data1.push(dic);
       }
     }
 
     if (data1.length > 0) {
       message.success(data1.length + ' sentences are loaded!');
     }
-    this.setState({[targetStateProperty]: data1});
+    this.setState({ [targetStateProperty]: data1 });
   }
 
   constructor(props) {
@@ -162,19 +160,19 @@ class CategoryConfigure extends Configure {
         this.props.session.classExample,
         this.props.session.classCounterexample
       );
-      this.setState({questionCategories: questions});
+      this.setState({ questionCategories: questions });
     } else {
       this.setState(
-        {"questionCategories": addKeys(this.props.session.questionCategories)}
+        { "questionCategories": addKeys(this.props.session.questionCategories) }
       );
     }
     this.setState({
       category_data: this.props.session.category_data,
       dataGolden: this.props.session.dataGolden
     });
-    super.makeProps();    
+    super.makeProps();
   }
-  
+
   render() {
     const textStyleExtras = [
       {
@@ -185,8 +183,8 @@ class CategoryConfigure extends Configure {
     ];
 
     return (<div>
-      <h2 style={{"padding-left": "1%"}} >Template for an Intent Classification Task </h2>
-      <p style={{"padding-left": "1%"}} >
+      <h2 style={{ "padding-left": "1%" }} >Template for an Intent Classification Task </h2>
+      <p style={{ "padding-left": "1%" }} >
         This template is used for the creation of tasks that require the workers to
         label the intent of utterances.
       </p>
@@ -204,9 +202,9 @@ class CategoryConfigure extends Configure {
     </div>);
   }
 
-  _showDataConfig () {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+  _showDataConfig() {
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     return (<>
       <FormItem
         {...formItemLayout}
@@ -214,13 +212,13 @@ class CategoryConfigure extends Configure {
           <span>
             Num of sentences per page&nbsp;
             <Tooltip title="Sentences per worker per task">
-              <Icon type="question-circle-o"/>
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         )}
       >
-        {getFieldDecorator('numofsent', {initialValue: this.state.numofsent})(
-          <InputNumber min={1} max={100} style={{height:"100%"}}/>
+        {getFieldDecorator('numofsent', { initialValue: this.state.numofsent })(
+          <InputNumber min={1} max={100} style={{ height: "100%" }} />
         )}
       </FormItem>
       {/*
@@ -230,7 +228,7 @@ class CategoryConfigure extends Configure {
           <span>
           Num of workers per sentence&nbsp;
           <Tooltip title="How many workers do you want to label per sentence?">
-          <Icon type="question-circle-o"/>
+          <QuestionCircleOutlined />
           </Tooltip>
           </span>
           )}
@@ -246,7 +244,7 @@ class CategoryConfigure extends Configure {
   }
 
   _showDataUpload(golden = false) {
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     let columns_dialog = [
       {
         title: 'ID',
@@ -278,8 +276,8 @@ class CategoryConfigure extends Configure {
       <div>Intent of utterance 2. (Ex. Purchase)</div>
       <div>...</div>
     </>) : 'Please split the utterances by new line.';
-    const targetStateProperty = golden ? 'dataGolden': 'category_data';
-    
+    const targetStateProperty = golden ? 'dataGolden' : 'category_data';
+
     return (<>
       <FormItem
         {...formItemLayout}
@@ -287,7 +285,7 @@ class CategoryConfigure extends Configure {
           <span>
             Upload your data&nbsp;
             <Tooltip title={explain}>
-              <Icon type="question-circle-o"/>
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         )}
@@ -297,23 +295,23 @@ class CategoryConfigure extends Configure {
           onChange={(e, results) => this.handleFileInputChange(e, results, targetStateProperty)}
         >
           <Button
-            style={{width: '90%'}}
+            style={{ width: '90%' }}
           >
-            <Icon type='upload'/> Click to Upload
+            <UploadOutlined /> Click to Upload
           </Button>
         </FileReaderInput>
       </FormItem>
 
       {(this.state[targetStateProperty] || []).length > 0 ? <div height={500}>
-        <Table rowKey="sentence" dataSource={this.state[targetStateProperty]} columns={columns_dialog} pagination={{hideOnSinglePage: true}} size="small"/>
+        <Table rowKey="sentence" dataSource={this.state[targetStateProperty]} columns={columns_dialog} pagination={{ hideOnSinglePage: true }} size="small" />
       </div> : null
       }
-    </>);    
+    </>);
   }
 
   _showCategoryConfig() {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     const instruction = (
       "In this section, you can set up the types of intents the worker can choose from. "
       + "Remember to include examples and counterexamples. They help the worker get a "
@@ -346,28 +344,28 @@ class CategoryConfigure extends Configure {
     );
   }
 
-  _showButtons () {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+  _showButtons() {
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     return (<>
-      <div style={{"text-align": "center", "padding-left": "10%"}}>
+      <div style={{ "text-align": "center", "padding-left": "10%" }}>
         <span>Please save before you preview</span>
       </div>
       <FormItem {...formItemLayoutWithOutLabel}>
-        <Button type="primary" style={{width: '90%'}} htmlType="submit">Save</Button>
+        <Button type="primary" style={{ width: '90%' }} htmlType="submit">Save</Button>
         <Button onClick={() => window.open(clientUrl + "/worker_category?MID=unknown&ID=" + this.props.session._id)}
-                type="primary" style={{width: '90%'}}>Preview</Button>
+          type="primary" style={{ width: '90%' }}>Preview</Button>
 
-        <br/>
+        <br />
         {/* {this._showVisibility()} */}
-        <Button type="primary" style={{width: '90%'}}
-                onClick={() => this._saveAsJSON()}
+        <Button type="primary" style={{ width: '90%' }}
+          onClick={() => this._saveAsJSON()}
         >
           Save Configuration as JSON
         </Button>
-        
-        <div style={{"padding-top": "5px"}}>
-          <CategoryTemplate thisstate={this.props.session}/>
+
+        <div style={{ "padding-top": "5px" }}>
+          <CategoryTemplate thisstate={this.props.session} />
         </div>
       </FormItem>
     </>);

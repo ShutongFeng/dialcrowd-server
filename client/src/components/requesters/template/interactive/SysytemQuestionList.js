@@ -1,32 +1,32 @@
 import React from "react";
-import {Button, Form, Icon, Input, Radio, Switch, Tooltip} from 'antd';
-import {MinusCircleOutlined, ExclamationCircleOutlined} from '@ant-design/icons'
+import { Button, Form, Input, Radio, Tooltip } from 'antd';
+import { QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 
 
-function test (questions, types, optionss,
-               exampless=undefined, counterexampless=undefined) {
+function test(questions, types, optionss,
+  exampless = undefined, counterexampless = undefined) {
 }
 
 
-function lists2Questions (queries, types, optionss,
-                          exampless=undefined, counterexampless=undefined) {
-  const _addKey = (xs) => (xs.map((x, i) => ({'key': i, 'content': x})));
+function lists2Questions(queries, types, optionss,
+  exampless = undefined, counterexampless = undefined) {
+  const _addKey = (xs) => (xs.map((x, i) => ({ 'key': i, 'content': x })));
 
   let questions = []
   for (let i = 0; i < queries.length; i += 1) {
     if (exampless !== undefined) {
       // Workaround: in case exampless[i] is not an array.
-      let examples = Array.isArray(exampless[i]) ? exampless[i]: [exampless[i]];
+      let examples = Array.isArray(exampless[i]) ? exampless[i] : [exampless[i]];
       let counterexamples = (
-        Array.isArray(exampless[i]) ? counterexampless[i]: [counterexampless[i]]
+        Array.isArray(exampless[i]) ? counterexampless[i] : [counterexampless[i]]
       );
 
       questions.push({
         "key": i,
         "title": queries[i],
         "type": types[i],
-        "options": (          
-          optionss[i] === null ? [{key: 0, content: ""}] : _addKey(optionss[i])
+        "options": (
+          optionss[i] === null ? [{ key: 0, content: "" }] : _addKey(optionss[i])
         ),
         "examples": _addKey(examples),
         "counterexamples": _addKey(counterexamples),
@@ -44,10 +44,10 @@ function lists2Questions (queries, types, optionss,
 }
 
 
-function addKeys (questions) {
+function addKeys(questions) {
   const _addKey = (xs) => (
     xs.map(
-      (x, i) => ({key: i, content: x})
+      (x, i) => ({ key: i, content: x })
     )
   );
   let newQuestions = [];
@@ -98,23 +98,23 @@ class QuestionList extends React.Component {
    * @{string} placeholderCounterexample: 
    * @{string} placeholderOption: 
    */
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.questionTypes = [
       ["Voting", "A/B tests", "Select the best system."],
       ["Likert Scale", "Likert Scale",
-       "Give the system a score from 1 to 5, 1 as strongly disagree and 5 as strongly agree."],
+        "Give the system a score from 1 to 5, 1 as strongly disagree and 5 as strongly agree."],
       ["Open ended", "Open ended",
-       "Require more thought and more than a simple one-word answer."],
+        "Require more thought and more than a simple one-word answer."],
       ["Radio", "Multiple Choice",
-       "Multiple choice, write your question, then separate your question and each answer with"
-       + " the '|' character without extra spaces in between."]
+        "Multiple choice, write your question, then separate your question and each answer with"
+        + " the '|' character without extra spaces in between."]
     ];
     this.formItemLayout = props.formItemLayout;
     this.formItemLayoutWithOutLabel = {
       wrapperCol: {
-        xs: {span: 24, offset: 0},
-        sm: {span: 20, offset: 4},
+        xs: { span: 24, offset: 0 },
+        sm: { span: 20, offset: 4 },
       },
     };
     this.styleWarning = {
@@ -124,15 +124,15 @@ class QuestionList extends React.Component {
     };
   }
 
-  render () {
+  render() {
     return (
       <>
         {this.props.questions.map(
           (question) => (this._renderQuestionSection(question))
         )}
         <Form.Item {...this.formItemLayoutWithOutLabel}>
-          <Button type="dashed" onClick={this._addQuestion} style={{width: '90%'}}>
-            <Icon type="plus"/> {this.props.textAddQuestion}
+          <Button type="dashed" onClick={this._addQuestion} style={{ width: '90%' }}>
+            <PlusOutlined /> {this.props.textAddQuestion}
           </Button>
         </Form.Item>
       </>
@@ -145,19 +145,19 @@ class QuestionList extends React.Component {
       {
         "question": "",
         "type": this.questionTypes[0][0],
-        "options": [{"key": 0, "content": ""}],
-        "examples": [{"key": 0, "content": ""}],
-        "counterexamples": [{"key": 0, "content": ""}]
+        "options": [{ "key": 0, "content": "" }],
+        "examples": [{ "key": 0, "content": "" }],
+        "counterexamples": [{ "key": 0, "content": "" }]
       }
     );
   };
-  
-  _renderQuestionSection (question) {
+
+  _renderQuestionSection(question) {
     switch (this.props.listStyle || 'box') {
-      case 'box': 
+      case 'box':
         return (
           <div key={question.key}
-               style={{ border: "2px solid black", margin: "10px", padding: 24}} >
+            style={{ border: "2px solid black", margin: "10px", padding: 24 }} >
             {this._renderQuestionBody(question)}
           </div>
         );
@@ -167,27 +167,28 @@ class QuestionList extends React.Component {
     }
   }
 
-  _renderQuestionBody (question) {
-    const {getFieldDecorator} = this.props.form;
+  _renderQuestionBody(question) {
+    const { getFieldDecorator } = this.props.form;
     return (
       <>
         {/* instruction tooltip that show instruction when mouse hovering over it. */}
-        <span style={{float: "left",
-                      "margin-bottom": "-30px"}}
-              class="instruction-tooltip">
+        <span style={{
+          float: "left",
+          "margin-bottom": "-30px"
+        }}
+          class="instruction-tooltip">
           <Tooltip
             title={this.props.textInstruction}>
-            <Icon type="question-circle-o"/> &nbsp; Tips
+            <QuestionCircleOutlined /> &nbsp; Tips
           </Tooltip>
         </span>
 
         {/* Remove question button. */}
         <Form.Item>
-          <span style={{float: "right", "margin-bottom": "-30px", "margin-top": "-20px", "margin-right": "-10px"}}>
+          <span style={{ float: "right", "margin-bottom": "-30px", "margin-top": "-20px", "margin-right": "-10px" }}>
             {this.props.questions.length > 1 ? (
-              <Icon
+              <MinusCircleOutlined
                 className="dynamic-delete-button"
-                type="minus-circle-o"
                 disabled={this.props.questions.length === 1}
                 onClick={() => this.props.removeByKey(
                   [this.props.fieldNameQuestion, question.key]
@@ -210,39 +211,39 @@ class QuestionList extends React.Component {
             }
           )(
             <Radio.Group onChange={
-            (e) => {
-              this.props.updateByKey(
-                [this.props.fieldNameQuestion, question.key],
-                {type: e.target.value}
-              )
-            }}
-                         name={question.key.toString()}>
+              (e) => {
+                this.props.updateByKey(
+                  [this.props.fieldNameQuestion, question.key],
+                  { type: e.target.value }
+                )
+              }}
+              name={question.key.toString()}>
               {this.questionTypes.map(
                 ([value, description, explanation]) => (
                   <Radio value={value}>
                     <span>
                       {description} &nbsp;
                       <Tooltip title={explanation}>
-                        <Icon type="question-circle-o"/>
+                        <QuestionCircleOutlined />
                       </Tooltip>
                     </span>
                   </Radio>
                 )
               )}
             </Radio.Group>
-          )}      
+          )}
         </Form.Item>
 
         {/* Questions */}
         <Form.Item {...(this.formItemLayout)}
-                   label={(
-                     <span>
-                       {this.props.questionFieldLabel || "Question"} &nbsp;
-                       <Tooltip title={this.props.questionHelpText}>
-                         <Icon type="question-circle-o"/>
-                       </Tooltip>
-                     </span>)}
-                   required={true}
+          label={(
+            <span>
+              {this.props.questionFieldLabel || "Question"} &nbsp;
+              <Tooltip title={this.props.questionHelpText}>
+                <QuestionCircleOutlined />
+              </Tooltip>
+            </span>)}
+          required={true}
         >
           {getFieldDecorator(`${this.props.fieldNameQuestion}[${question.key}]["title"]`, {
             initialValue: question.title,
@@ -253,10 +254,10 @@ class QuestionList extends React.Component {
               message: "Please ask a question to the workers.",
             }],
           })(
-            <Input placeholder={this.props.placeholderQuestion} style={{width: '90%', marginRight: 8}}/>
+            <Input placeholder={this.props.placeholderQuestion} style={{ width: '90%', marginRight: 8 }} />
           )}
         </Form.Item>
-        
+
         {/* Configuration for radios. */}
         { question.type === "Radio" ?
           this._showDynamicItems(
@@ -266,7 +267,7 @@ class QuestionList extends React.Component {
             question.options,
             [this.props.fieldNameQuestion, question.key, "options"],
             this.props.placeholderOption
-          ) : null }
+          ) : null}
 
         {/* Examples. */}
         {question.examples === undefined ? null : this._showDynamicItems(
@@ -284,12 +285,12 @@ class QuestionList extends React.Component {
           question.counterexamples,
           [this.props.fieldNameQuestion, question.key, "counterexamples"],
           this.props.placeholderCounterexample, 3
-        )}    
+        )}
       </>
     );
   }
 
-  _showDynamicItems (title, textHelp, textAdd, fields, keys, placeholder = "", recommendedNumber = -1) {    
+  _showDynamicItems(title, textHelp, textAdd, fields, keys, placeholder = "", recommendedNumber = -1) {
     /* Show dynamic fields, and the adding button as well. */
     return (
       <>
@@ -301,27 +302,27 @@ class QuestionList extends React.Component {
               {title} &nbsp;
               <Tooltip
                 title={textHelp}>
-                <Icon type="question-circle-o"/>
+                <QuestionCircleOutlined />
               </Tooltip>
             </span>)}
           required={true}
         >
-          { this._showDynamicInputs(fields, keys, placeholder) }
+          {this._showDynamicInputs(fields, keys, placeholder)}
         </Form.Item>
 
         {/* The add button. */}
         <Form.Item
           {...this.formItemLayoutWithOutLabel}>
           <Button type="dashed"
-                  onClick={() => {this.props.addByKey(keys)}}
-                  style={{width: '90%'}}>
-            <Icon type="plus"/> {textAdd}
+            onClick={() => { this.props.addByKey(keys) }}
+            style={{ width: '90%' }}>
+            <PlusOutlined /> {textAdd}
           </Button>
           {/* Warning message when the number of fields is too many. */}
           {
             (recommendedNumber > 0 && fields.length > recommendedNumber) ?
-            <div style={this.styleWarning}>
-              <ExclamationCircleOutlined />
+              <div style={this.styleWarning}>
+                <ExclamationCircleOutlined />
               Adding more than {recommendedNumber} examples is not recommended.
             </div> : null
           }
@@ -330,7 +331,7 @@ class QuestionList extends React.Component {
     );
   }
 
-  _showDynamicInputs (fields, keys, placeholder = "") {
+  _showDynamicInputs(fields, keys, placeholder = "") {
     /** 
      * Render example(s) based on the type of `example[k]`. `example[k]` can
      * a string or an array of string.
@@ -341,12 +342,12 @@ class QuestionList extends React.Component {
      * @param {String}	placeholder			Placeholder for the fields.
      * @param {Int}	    recommendedNumber	If > 0, show warning when fields.length > recommendedNumber.
      **/
-    const {getFieldDecorator} = this.props.form;
-    const {removeExample} = this.props;
+    const { getFieldDecorator } = this.props.form;
+    const { removeExample } = this.props;
 
     // Workround (?)
-    if (fields === undefined){
-      fields = [{key: 0, content: ""}]
+    if (fields === undefined) {
+      fields = [{ key: 0, content: "" }]
     }
 
     // Generate the field name in the HTML form.
@@ -361,27 +362,27 @@ class QuestionList extends React.Component {
       children.push(
         getFieldDecorator(
           `${fieldName}[${field.key}]`, {
-            initialValue: field.content,
-            validateTrigger: ['onChange', 'onBlur'],          
-            rules: [{
-              required: true,
-              whitespace: true,
-              message: "Please input some text.",
-            }],
-          }
+          initialValue: field.content,
+          validateTrigger: ['onChange', 'onBlur'],
+          rules: [{
+            required: true,
+            whitespace: true,
+            message: "Please input some text.",
+          }],
+        }
         )(
-          <Input placeholder={placeholder} style={{width: '90%', marginRight: 8}}/>
+          <Input placeholder={placeholder} style={{ width: '90%', marginRight: 8 }} />
         )
       )
       if (fields.length > 1) {
         children.push(
           <Tooltip>
             <a onClick={
-            (
-              (id) => () => (
-                this.props.removeByKey(keys.concat([id]))
-              )
-            )(field.key)
+              (
+                (id) => () => (
+                  this.props.removeByKey(keys.concat([id]))
+                )
+              )(field.key)
             }>
               <MinusCircleOutlined />
             </a>
@@ -395,4 +396,4 @@ class QuestionList extends React.Component {
 
 
 export default QuestionList;
-export {lists2Questions, addKeys};
+export { lists2Questions, addKeys };

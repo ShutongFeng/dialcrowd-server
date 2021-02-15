@@ -1,16 +1,13 @@
 import React from "react";
-import {Button, Collapse, Form, Icon, Input, Modal, Radio, Rate, Select, Table} from 'antd';
-import TextEditor from './TextEditor'
-import {ConsentForm, AnonymityNotice} from "./AgreeModal";
-import {serverUrl} from "../../configs";
+import { Button, Collapse, Form, Modal, Radio, Select, Table } from 'antd';
+import { ConsentForm } from "./AgreeModal";
+import { serverUrl } from "../../configs";
 import queryString from 'query-string';
-import {lists2Questions, addKeys} from "../requesters/template/QuestionList.js"
-import QuestionList, {Markdown} from "./QuestionList.js"
-import {lists2Systems} from "../requesters/template/System.js"
-import {_renderExamples} from "./WorkerInteractive.js"
-import {showFeedbackQuestion} from "./QuestionList.js";
-import ReactMarkdown from 'react-markdown';
-import {getStyle} from './style.js';
+import { lists2Questions, addKeys } from "../requesters/template/QuestionList.js"
+import QuestionList, { Markdown } from "./QuestionList.js"
+import { _renderExamples } from "./WorkerInteractive.js"
+import { showFeedbackQuestion } from "./QuestionList.js";
+import { getStyle } from './style.js';
 
 
 const confirm = Modal.confirm;
@@ -20,20 +17,19 @@ const RadioGroup = Radio.Group;
 
 function getQuestion(t, id) {
   console.log(serverUrl)
-  const newurl = "https://cmu-dialcrowd.herokuapp.com"
   fetch(serverUrl + '/api/worker/quality/' + id)
     .then(function (response) {
       return response.json();
     })
     .then(function (json) {
       if (json.err !== undefined) {
-        Modal.error({content: json.err});
+        Modal.error({ content: json.err });
         return;
       }
       let context = [];
       let response = [];
 
-      json.quality_data.forEach(function(data, index){
+      json.quality_data.forEach(function (data, index) {
         context.push(data.context);
         response.push(data.response);
       })
@@ -50,7 +46,7 @@ function getQuestion(t, id) {
           json.example,
           json.counterexample
         );
-      } else {       
+      } else {
         questionSurveys = addKeys(json.questionSurveys);
       }
       // Workaround: json.questionFeedbacks should not be undefined.
@@ -62,7 +58,7 @@ function getQuestion(t, id) {
         );
       } else {
         questionFeedbacks = addKeys(json.questionFeedbacks);
-      }        
+      }
       console.log(json.quality_data)
 
       t.setState({
@@ -131,7 +127,7 @@ class WorkerQuality extends React.Component {
       feedback: [],
       questions: [],
       times: [],
-      responses:[],
+      responses: [],
       consent: "",
       radios: [],
       feedbackradio: [],
@@ -151,10 +147,10 @@ class WorkerQuality extends React.Component {
       ID = params.ID;
     }
 
-    this.setState({userID: time});
-    this.setState({MID: mid});
-    this.setState({ID: ID});
-    this.setState({prev: time});
+    this.setState({ userID: time });
+    this.setState({ MID: mid });
+    this.setState({ ID: ID });
+    this.setState({ prev: time });
     getQuestion(this, ID);
   }
 
@@ -166,12 +162,12 @@ class WorkerQuality extends React.Component {
     let responses = {};
     let feedback = {};
     this.props.form.validateFields((err, values) => {
-      if (!err){
-        Object.keys(values).forEach(function(data){
-          if (data.includes("FeedbackOpen|||")){
+      if (!err) {
+        Object.keys(values).forEach(function (data) {
+          if (data.includes("FeedbackOpen|||")) {
             feedback[data] = values[data]
           }
-          else{
+          else {
             responses[data] = values[data]
           }
         })
@@ -179,12 +175,12 @@ class WorkerQuality extends React.Component {
         this.state.times.push(time - this.state.prev);
         this.state.responses.push(responses);
 
-        if (this.state.current < this.state.numofhit){ 
+        if (this.state.current < this.state.numofhit) {
           this.props.form.resetFields();
-          this.setState({current: this.state.current + 1});
+          this.setState({ current: this.state.current + 1 });
         }
-        else{
-          SubmitFromUser(this, {"responses": this.state.responses, "feedback": feedback, "times": this.state.times})
+        else {
+          SubmitFromUser(this, { "responses": this.state.responses, "feedback": feedback, "times": this.state.times })
           confirm({
             title: 'Thank you for submission',
             content: 'Your survey code: ' + this.state.userID,
@@ -195,7 +191,7 @@ class WorkerQuality extends React.Component {
           });
         }
       }
-      else{
+      else {
         confirm({
           content: 'Please answer all the questions',
           onOk() {
@@ -219,7 +215,7 @@ class WorkerQuality extends React.Component {
   }
 
   openInstructions = () => {
-    if (!(this.state.activeKey.includes("2"))){
+    if (!(this.state.activeKey.includes("2"))) {
       let x = this.state.activeKey;
       x.push("2");
       this.setState({
@@ -229,16 +225,16 @@ class WorkerQuality extends React.Component {
   }
 
   render() {
-    const {current} = this.state;
+    const { current } = this.state;
 
     const { getFieldDecorator } = this.props.form;
     const formItemLayout2 = {
       labelCol: { span: 10 },
       wrapperCol: { span: 7 },
       colon: false
-    };  
+    };
     const formItemLayout = {
-      wrapperCol: {span: 10},
+      wrapperCol: { span: 10 },
       colon: false
     }
 
@@ -253,121 +249,125 @@ class WorkerQuality extends React.Component {
     let styles = getStyle(this.state.style);
 
     return <div style={styles.global}>
-      <Form onSubmit={this.handleSubmit} style={{"marginBottom": 0.6}}>
+      <Form onSubmit={this.handleSubmit} style={{ "marginBottom": 0.6 }}>
         <Collapse defaultActiveKey={['1', '2']}
-    activeKey={this.state.activeKey} onChange={this.changeTab}>
-    <Collapse.Panel header="Background" key="1" style={styles.tabTitle} >
-      <p style={styles.background}>
-        <Markdown enableMarkdown={this.state.enableMarkdown}>
-          {this.state.generic_introduction}
-        </Markdown>
-      </p>
-      <ConsentForm consent={this.state.consent} checkboxes={this.state.requirements} />
-      {/* <AnonymityNotice />               */}
-    </Collapse.Panel>
-    <Collapse.Panel header="Instructions" key="2"
-                    style={styles.tabTitle}>
-      <div style={styles.instruction}>
-        {this.state.enableMarkdown ?
-         <Markdown enableMarkdown={this.state.enableMarkdown}>
-           {this.state.generic_instructions}
-         </Markdown> : <b>{this.state.generic_instructions}</b>
-        }
-      </div>
-      <span style={{
-        ...styles.instruction,
-        "margin-top": `${-8 + styles.global.spacing}px`,
-        "margin-bottom": `${styles.global.spacing}px`,
-        fontSize: styles.instruction.fontSize - 2
-      }}>
-    We expect this HIT will take <b>{this.state.time} minute(s)</b> and we will pay <b>${this.state.payment}</b>.
-                                                                                                          </span>
-    {
-      showExamples(
-        this.state.questionSurveys,
-        styles,
-        {...styles.example, "fontSize": styles.example.fontSize + 4}
-      )
-    }
-      
-    </Collapse.Panel>
-    
-    <Collapse.Panel header="Quality Questions" key="3" style={styles.tabTitle}>
-      {!this.state.activeKey.includes("2") ?
-       <div style={{"textAlign": "center"}}>
-         <Button type="default" onClick={this.openInstructions}>Example Responses</Button>
-       </div> : null}
-      <div title="quality questions">
-        <p style={{"textAlign": "center", "margin-top": `${styles.global.spacing}px`}}>
-          <div style={{"textAlign": "center", "fontSize": 18}}>
-            <b>"Answer the questions on the right about the context and response on the left."</b>
-          </div>
-        </p>
-        <div style={{"display": "inline-block", "width": "50%", "padding-left": "40px", "padding-right": "10px", "vertical-align": "top", "margin-top": `${-15 + styles.global.spacing}px`}}>
-          <div>
-            <p style={{"fontSize": styles.context.fontSize + 6,
-                       "textAlign": styles.context.textAlign,
-                       "fontWeight": "bold", "margin-bottom": "0px"}}>
-              Context
+          activeKey={this.state.activeKey} onChange={this.changeTab}>
+          <Collapse.Panel header="Background" key="1" style={styles.tabTitle} >
+            <p style={styles.background}>
+              <Markdown enableMarkdown={this.state.enableMarkdown}>
+                {this.state.generic_introduction}
+              </Markdown>
             </p>
-          </div>
-          <div>
-            {this.state.flag ?
-             this.state.context[this.state.current - 1] ?
-             this.state.context[this.state.current - 1].map((item, i) => (
-               <p style={styles.context}>
-                 {item.turn}. {item.utterance}
-               </p>
-             ))
-            : null : null
+            <ConsentForm consent={this.state.consent} checkboxes={this.state.requirements} />
+            {/* <AnonymityNotice />               */}
+          </Collapse.Panel>
+          <Collapse.Panel header="Instructions" key="2"
+            style={styles.tabTitle}>
+            <div style={styles.instruction}>
+              {this.state.enableMarkdown ?
+                <Markdown enableMarkdown={this.state.enableMarkdown}>
+                  {this.state.generic_instructions}
+                </Markdown> : <b>{this.state.generic_instructions}</b>
+              }
+            </div>
+            <span style={{
+              ...styles.instruction,
+              "margin-top": `${-8 + styles.global.spacing}px`,
+              "margin-bottom": `${styles.global.spacing}px`,
+              fontSize: styles.instruction.fontSize - 2
+            }}>
+              We expect this HIT will take <b>{this.state.time} minute(s)</b> and we will pay <b>${this.state.payment}</b>.
+                                                                                                          </span>
+            {
+              showExamples(
+                this.state.questionSurveys,
+                styles,
+                { ...styles.example, "fontSize": styles.example.fontSize + 4 }
+              )
             }
-          </div>
-          <div>
-            <span style={{"fontSize": styles.response.fontSize + 6,
-                          "textAlign": styles.response.textAlign,
-                          "fontWeight": "bold",
-                          "margin-bottom": `${styles.global.spacing}px`}}>
-              Response
+
+          </Collapse.Panel>
+
+          <Collapse.Panel header="Quality Questions" key="3" style={styles.tabTitle}>
+            {!this.state.activeKey.includes("2") ?
+              <div style={{ "textAlign": "center" }}>
+                <Button type="default" onClick={this.openInstructions}>Example Responses</Button>
+              </div> : null}
+            <div title="quality questions">
+              <p style={{ "textAlign": "center", "margin-top": `${styles.global.spacing}px` }}>
+                <div style={{ "textAlign": "center", "fontSize": 18 }}>
+                  <b>"Answer the questions on the right about the context and response on the left."</b>
+                </div>
+              </p>
+              <div style={{ "display": "inline-block", "width": "50%", "padding-left": "40px", "padding-right": "10px", "vertical-align": "top", "margin-top": `${-15 + styles.global.spacing}px` }}>
+                <div>
+                  <p style={{
+                    "fontSize": styles.context.fontSize + 6,
+                    "textAlign": styles.context.textAlign,
+                    "fontWeight": "bold", "margin-bottom": "0px"
+                  }}>
+                    Context
+            </p>
+                </div>
+                <div>
+                  {this.state.flag ?
+                    this.state.context[this.state.current - 1] ?
+                      this.state.context[this.state.current - 1].map((item, i) => (
+                        <p style={styles.context}>
+                          {item.turn}. {item.utterance}
+                        </p>
+                      ))
+                      : null : null
+                  }
+                </div>
+                <div>
+                  <span style={{
+                    "fontSize": styles.response.fontSize + 6,
+                    "textAlign": styles.response.textAlign,
+                    "fontWeight": "bold",
+                    "margin-bottom": `${styles.global.spacing}px`
+                  }}>
+                    Response
             </span>
-          </div>
-          <div>
-            {this.state.flag ?
-             this.state.response[this.state.current - 1] ?
-             <div>
-               <p style={styles.response}>{this.state.response[this.state.current - 1]}</p>
-             </div>
-            : null : null
-            }
-          </div>
-        </div>
-        
-        <div style={{"display": "inline-block", "width": "50%", "padding-right": "40px", "padding-left": "10px", "vertical-align": "top", "margin-top": `${-15+styles.global.spacing}px`, ...styles.question}}>
-          { /* Survey questions. */ }
-          <QuestionList
-            getFieldDecorator={getFieldDecorator}
-            questions={this.state.questionSurveys}
-            title="Questions"
-          />       
-        </div>
+                </div>
+                <div>
+                  {this.state.flag ?
+                    this.state.response[this.state.current - 1] ?
+                      <div>
+                        <p style={styles.response}>{this.state.response[this.state.current - 1]}</p>
+                      </div>
+                      : null : null
+                  }
+                </div>
+              </div>
 
-      </div>
+              <div style={{ "display": "inline-block", "width": "50%", "padding-right": "40px", "padding-left": "10px", "vertical-align": "top", "margin-top": `${-15 + styles.global.spacing}px`, ...styles.question }}>
+                { /* Survey questions. */}
+                <QuestionList
+                  getFieldDecorator={getFieldDecorator}
+                  questions={this.state.questionSurveys}
+                  title="Questions"
+                />
+              </div>
 
-      <div style={{"backgroundColor": "#C1E7F8"}}>
-        <FormItem style={{"textAlign": "center"}}
-                  wrapperCol={{span: 12, offset: 6}}>
-          {current < this.state.numofhit ?
-                     <Button type="primary" htmlType="submit">
-                       Next {current}/{this.state.numofhit}
-                     </Button>
-                   : showFeedbackQuestion(this.state.hasFeedbackQuestion, getFieldDecorator)
-          }
-        </FormItem>
-      </div>
-      {current >= this.state.numofhit ?
-       <div style={{"text-align": "center", "margin-top": `${-20+styles.global.spacing}px`, "margin-bottom": "-10px"}}>
-         <Button type="primary" htmlType="submit">Submit</Button>
-       </div> : null}
-    </Collapse.Panel>
+            </div>
+
+            <div style={{ "backgroundColor": "#C1E7F8" }}>
+              <FormItem style={{ "textAlign": "center" }}
+                wrapperCol={{ span: 12, offset: 6 }}>
+                {current < this.state.numofhit ?
+                  <Button type="primary" htmlType="submit">
+                    Next {current}/{this.state.numofhit}
+                  </Button>
+                  : showFeedbackQuestion(this.state.hasFeedbackQuestion, getFieldDecorator)
+                }
+              </FormItem>
+            </div>
+            {current >= this.state.numofhit ?
+              <div style={{ "text-align": "center", "margin-top": `${-20 + styles.global.spacing}px`, "margin-bottom": "-10px" }}>
+                <Button type="primary" htmlType="submit">Submit</Button>
+              </div> : null}
+          </Collapse.Panel>
         </Collapse>
       </Form>
 
@@ -398,19 +398,19 @@ function showExamples(questions, styles, titleStyle) {
   if (dsExamples.length === 0) {
     return null;
   } else {
-    return (<> 
+    return (<>
       <div style={titleStyle}>
         <b>Examples</b>
       </div>
       <Table rowKey="sentid"
-             dataSource={dsExamples}
-             columns={columns_example}
-             size="small"
-             pagination={{hideOnSinglePage: true}}
-             style={styles.example} />
+        dataSource={dsExamples}
+        columns={columns_example}
+        size="small"
+        pagination={{ hideOnSinglePage: true }}
+        style={styles.example} />
     </>);
   }
 }
 
 export default Form.create()(WorkerQuality)
-export {showExamples};
+export { showExamples };

@@ -1,18 +1,14 @@
-import React, { Component } from 'react'
-import { Button, Form, Icon, Input, message, Radio, Spin, Switch, Tooltip, Modal, Table } from 'antd';
+import React from 'react'
+import { Button, Form, message, Spin, Tooltip, Table } from 'antd';
+import { QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { connect } from "react-redux";
-import queryString from 'query-string';
-import { clientUrl, serverUrl } from "../../../../configs";
 import { loadData } from "../../../../actions/sessionActions";
-import { Message } from 'react-chat-ui';
 import { new_project_data } from "../../../../actions/crowdAction";
 import InteractiveTemplate from "./InteractiveTemplate";
 import FileReaderInput from 'react-file-reader-input';
 import Configure from "../Configure.js"
 import { SurveyQuestionList, addKeys } from "../QuestionList.js"
-import PreviewButton from "./PreviewButton.js";
 import System, { lists2Systems } from "./System.js"
-import { saveAs } from 'file-saver';
 
 
 const FormItem = Form.Item;
@@ -195,7 +191,7 @@ class InteractiveConfigure extends Configure {
           <span>
             Upload your data&nbsp;
             <Tooltip title={explain}>
-              <Icon type="question-circle-o" />
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         )}
@@ -207,7 +203,7 @@ class InteractiveConfigure extends Configure {
           <Button
             style={{ width: '90%' }}
           >
-            <Icon type='upload' /> Click to Upload
+            <UploadOutlined /> Click to Upload
           </Button>
         </FileReaderInput>
       </FormItem>

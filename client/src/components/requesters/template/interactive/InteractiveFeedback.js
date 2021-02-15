@@ -1,21 +1,22 @@
 import React from "react";
-import {deleteResult, getResult} from '../../../../actions/crowdAction';
-import {connect} from "react-redux";
-import {serverUrl} from "../../../../configs";
-import {Button, Icon, Table} from 'antd';
-import {saveAs} from 'file-saver';
+import { deleteResult, getResult } from '../../../../actions/crowdAction';
+import { connect } from "react-redux";
+import { serverUrl } from "../../../../configs";
+import { Button, Table } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import { saveAs } from 'file-saver';
 
-function get_interactive_results(t){
+function get_interactive_results(t) {
   fetch(serverUrl + '/api/result/interactive/' + t.props.session._id)
     .then(function (response) {
       return response.json();
     })
-    .then(function (json){
+    .then(function (json) {
       let feedbacks = [];
-      for (const annotation of json.unit[0].annotations) {        
+      for (const annotation of json.unit[0].annotations) {
         for (const survey of annotation.survey) {
           if (survey.Name === 'FEEDBACK') {
-            feedbacks.push({userID: annotation.userID, feedback: survey.A});
+            feedbacks.push({ userID: annotation.userID, feedback: survey.A });
           }
         }
       }
@@ -46,7 +47,7 @@ class InteractiveFeedback extends React.Component {
 
   render() {
     const feedback_detail_col = [
-    {
+      {
         title: 'user id',
         dataIndex: 'userID',
         key: 'userID'
@@ -60,15 +61,15 @@ class InteractiveFeedback extends React.Component {
 
     return <div>
       <Button
-          onClick={() => {
-            var blob = new Blob(
-                [JSON.stringify(this.state.feedbacks, null, 2)],
-                {type: 'text/plain;charset=utf-8'},
-            )
-            saveAs(blob, "interactive_feedback.json")
-          }}
+        onClick={() => {
+          var blob = new Blob(
+            [JSON.stringify(this.state.feedbacks, null, 2)],
+            { type: 'text/plain;charset=utf-8' },
+          )
+          saveAs(blob, "interactive_feedback.json")
+        }}
       >
-        <Icon type='download'/> Download Feedback
+        <DownloadOutlined /> Download Feedback
       </Button>
       <br></br>
       <br></br>

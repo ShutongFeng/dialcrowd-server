@@ -1,11 +1,12 @@
-import React, {Component} from 'react'
-import {Button, Icon, Table} from 'antd';
-import {connect} from "react-redux";
-import {saveAs} from 'file-saver';
+import React, { Component } from 'react'
+import { Button, Table } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons'
+import { connect } from "react-redux";
+import { saveAs } from 'file-saver';
 
-import {new_project_data} from "../../../../actions/crowdAction";
-import {loadData} from "../../../../actions/sessionActions";
-import {serverUrl} from "../../../../configs";
+import { new_project_data } from "../../../../actions/crowdAction";
+import { loadData } from "../../../../actions/sessionActions";
+import { serverUrl } from "../../../../configs";
 
 function get_sequence_results(t) {
   fetch(serverUrl + '/api/get/result/sequence/' + t.props.session._id)
@@ -24,7 +25,7 @@ function get_sequence_results(t) {
       }
       let feedbacks = [];
       for (const [uid, feedback] of Object.entries(workerFeedback)) {
-        feedbacks.push({userId: uid, feedback: feedback})
+        feedbacks.push({ userId: uid, feedback: feedback })
       }
       t.setState({
         feedbacks: feedbacks
@@ -41,7 +42,7 @@ class SequenceFeedback extends Component {
     }
   }
 
-  componentDidMount() {    
+  componentDidMount() {
     get_sequence_results(this);
     setInterval(
       () => get_sequence_results(this),
@@ -52,7 +53,7 @@ class SequenceFeedback extends Component {
   render() {
 
     const columns = [
-    {
+      {
         title: 'user id',
         dataIndex: 'userId',
         key: 'userId'
@@ -66,24 +67,24 @@ class SequenceFeedback extends Component {
 
     return <div>
       <Button
-          onClick={() => {
-            var blob = new Blob(
-                [JSON.stringify(this.state.feedbacks, null, 2)],
-                {type: 'text/plain;charset=utf-8'},
-            )
-            saveAs(blob, "sequence_feedback.json")
-          }}
+        onClick={() => {
+          var blob = new Blob(
+            [JSON.stringify(this.state.feedbacks, null, 2)],
+            { type: 'text/plain;charset=utf-8' },
+          )
+          saveAs(blob, "sequence_feedback.json")
+        }}
       >
-        <Icon type='download'/> Download Feedback
+        <DownloadOutlined /> Download Feedback
       </Button>
       <br></br>
       <br></br>
 
       <h1>Feedback </h1>
       <Table rowKey="userId"
-             dataSource={this.state.feedbacks}
-             columns={columns}
-             size="small"
+        dataSource={this.state.feedbacks}
+        columns={columns}
+        size="small"
       />
     </div>
   }

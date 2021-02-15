@@ -1,6 +1,7 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {Icon, Tabs} from 'antd';
+import { connect } from 'react-redux';
+import { Tabs } from 'antd';
+import { HomeOutlined, PayCircleOutlined, AreaChartOutlined, MessageOutlined, BarChartOutlined } from '@ant-design/icons';
 import CategoryConfigure from "./CategoryConfigure.js";
 import CategoryResult from "./CategoryResult.js";
 import CategoryQuality from "./CategoryQuality.js";
@@ -22,25 +23,25 @@ class Category extends React.Component {
   render() {
     return <div>
       <Tabs defaultActiveKey="1">
-        <TabPane tab={<span><Icon type="home"/>Configure</span>} key="1">
+        <TabPane tab={<span><HomeOutlined />Configure</span>} key="1">
           {this.props.session.hasOwnProperty('classLabel') ?
-              <CategoryConfigure data={this.props.session}/>
-              : null}
+            <CategoryConfigure data={this.props.session} />
+            : null}
         </TabPane>
-        <TabPane tab={<span><Icon type="area-chart"/>Raw Results</span>} key="2">
-          <CategoryResult data={this.props.session}/>
+        <TabPane tab={<span><AreaChartOutlined />Raw Results</span>} key="2">
+          <CategoryResult data={this.props.session} />
         </TabPane>
-        <TabPane tab={<span><Icon type="message"/>Feedback</span>} key="5">
-          <CategoryFeedback data={this.props.session}/>
+        <TabPane tab={<span><MessageOutlined />Feedback</span>} key="5">
+          <CategoryFeedback data={this.props.session} />
         </TabPane>
-        <TabPane tab={<span><Icon type="bar-chart"/>Quality</span>} key="3">
-          <CategoryQuality data={this.props.session}/>
+        <TabPane tab={<span><BarChartOutlined />Quality</span>} key="3">
+          <CategoryQuality data={this.props.session} />
         </TabPane>
-        <TabPane tab={<span><Icon type="pay-circle-o"/>Payment</span>} key="4">
-          <CategoryPayment data={this.props.session}/>
+        <TabPane tab={<span><PayCircleOutlined />Payment</span>} key="4">
+          <CategoryPayment data={this.props.session} />
         </TabPane>
         {/*
-        <TabPane tab={<span><Icon type="home"/>Make Golden Answers</span>} key="3">
+        <TabPane tab={<span><HomeOutlined />Make Golden Answers</span>} key="3">
           <Iframe style={{"margin-right": "10px"}} url={clientUrl + "/worker_category?MID=golden&ID=" + this.props.session._id}
                   width="100%"
                   height="1000px"

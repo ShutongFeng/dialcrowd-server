@@ -1,7 +1,8 @@
 import React from "react";
-import { Button, Collapse, Drawer, Form, Input, Modal, Radio, Rate, Table, Tooltip, Icon, Alert, Row, Col, Card } from 'antd';
+import { Button, Collapse, Drawer, Form, Modal, Radio, Table, Tooltip, Alert, Row, Col, Card } from 'antd';
+import { SmileOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { clientUrl, serverUrl } from "../../configs";
-import { ConsentForm, AnonymityNotice } from "./AgreeModal";
+import { ConsentForm } from "./AgreeModal";
 import queryString from 'query-string';
 import Iframe from 'react-iframe';
 import { connect } from "react-redux";
@@ -510,7 +511,7 @@ class WorkerInteractive extends React.Component {
           message="Say Bye"
           description="Remember to say 'bye' to Dialogue System!"
           type="info"
-          icon={<Icon type="smile" />}
+          icon={<SmileOutlined />}
           showIcon={true}
           closable
         />
@@ -518,7 +519,7 @@ class WorkerInteractive extends React.Component {
           message="Do not click Return"
           description="It will terminate the task. To exit the dialogue, click the form again."
           type="warning"
-          icon={<Icon type="close-circle" />}
+          icon={<CloseCircleOutlined />}
           showIcon={true}
           closable
         />

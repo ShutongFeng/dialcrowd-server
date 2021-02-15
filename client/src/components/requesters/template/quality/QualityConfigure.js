@@ -1,17 +1,14 @@
-import React, {Component} from 'react';
-import {Button, Form, Icon, Input, InputNumber, message, Modal, Switch, Table, Tooltip} from 'antd';
-import {connect} from "react-redux";
+import React from 'react';
+import { Button, Form, message, Table, Tooltip } from 'antd';
+import { EyeOutlined, UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { connect } from "react-redux";
 import 'react-datasheet/lib/react-datasheet.css';
 import FileReaderInput from 'react-file-reader-input';
-import QualitySurvey from "./QualitySurvey";
-import {clientUrl, serverUrl} from "../../../../configs";
-import {loadData} from "../../../../actions/sessionActions";
-import {new_project_data} from "../../../../actions/crowdAction";
-import QualityFeedbackLabel from "./QualityFeedbackLabel";
+import { clientUrl } from "../../../../configs";
+import { loadData } from "../../../../actions/sessionActions";
+import { new_project_data } from "../../../../actions/crowdAction";
 import QualityTemplate from "./QualityTemplate";
 import Configure from "../Configure.js"
-import {saveAs} from 'file-saver';
-import { SketchPicker, ChromePicker } from 'react-color';
 
 const FormItem = Form.Item;
 
@@ -45,7 +42,7 @@ class QualityConfigure extends Configure {
   makeProps() {
     super.makeProps();
     for (const prop of ["quality_data", "dataGolden"]) {
-      this.setState({[prop]: this.props.session[prop]});
+      this.setState({ [prop]: this.props.session[prop] });
     };
   }
 
@@ -71,7 +68,7 @@ class QualityConfigure extends Configure {
       switch (line) {
         case 'Context': {
           lineType = 'context';
-          data.push({sentid: data.length});
+          data.push({ sentid: data.length });
           break;
         }
         case 'Response': {
@@ -90,7 +87,7 @@ class QualityConfigure extends Configure {
             } else if (lineType === 'context') {
               last[lineType] = last[lineType] || [];
               last[lineType].push(
-                {utterance: line, turn: last[lineType].length + 1}
+                { utterance: line, turn: last[lineType].length + 1 }
               );
             } else if (lineType === 'answer') {
               last[lineType] = last[lineType] || [];
@@ -101,11 +98,11 @@ class QualityConfigure extends Configure {
       }
     }
     if (data.length > 0) {
-      message.success(`${data.length} dialogs are loaded!`); 
+      message.success(`${data.length} dialogs are loaded!`);
     }
-    this.setState({[stateProperty]: data});
+    this.setState({ [stateProperty]: data });
   }
-  
+
   render() {
     const textStyleExtras = [
       {
@@ -126,8 +123,8 @@ class QualityConfigure extends Configure {
     ];
     return (
       <div>
-        <h2 style={{"padding-left": "1%"}}>Template for a Quality Task</h2>
-        <p style={{"padding-left": "1%"}}>This template is used for the creation of tasks that require the workers to assess the quality of the conversation.
+        <h2 style={{ "padding-left": "1%" }}>Template for a Quality Task</h2>
+        <p style={{ "padding-left": "1%" }}>This template is used for the creation of tasks that require the workers to assess the quality of the conversation.
           You can give the worker one or more conversations, and ask questions about those conversations.</p>
         <Form onSubmit={this.handleSubmit}>
           {this._showGeneralConfig()}
@@ -143,8 +140,8 @@ class QualityConfigure extends Configure {
     );
   }
 
-  _showDataUpload(golden=false) {
-    const {formItemLayout} = this;
+  _showDataUpload(golden = false) {
+    const { formItemLayout } = this;
     let columns_dialog = [
       {
         title: 'ID',
@@ -200,33 +197,33 @@ class QualityConfigure extends Configure {
         <div>Answer to the 2st question for a dialog.</div>
       </>;
     }
-    
+
     return (<>
       <FormItem {...formItemLayout}
-                label={(
-                  <span>
-                    {golden ? "Upload data with answer" : "Upload your data"} &nbsp;
-                    <Tooltip title={
-                      <div>
-                        <div>Please format your data as below, separated with new lines:</div>
-                        {example}
-                        {golden ? <div><b>It's is recommended that the number of golden is 10%
+        label={(
+          <span>
+            {golden ? "Upload data with answer" : "Upload your data"} &nbsp;
+            <Tooltip title={
+              <div>
+                <div>Please format your data as below, separated with new lines:</div>
+                {example}
+                {golden ? <div><b>It's is recommended that the number of golden is 10%
                           of the number of the data to be annotated.</b></div> : null}
-                      </div>
-                    }>
-                      <Icon type="question-circle-o"/>
-                    </Tooltip>
-                  </span>
-                )}
+              </div>
+            }>
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </span>
+        )}
       >
         <FileReaderInput
           as='text'
           onChange={(e, results) => this.handleFileInputChange(e, results, stateProperty)}
         >
           <Button
-            style={{width: '90%'}}
+            style={{ width: '90%' }}
           >
-            <Icon type='upload'/> Click to Upload
+            <UploadOutlined /> Click to Upload
           </Button>
         </FileReaderInput>
         <div>
@@ -238,20 +235,20 @@ class QualityConfigure extends Configure {
       {(this.state[stateProperty] || []).length > 0 ? <div>
         <div title={"Your Data"} height={500}>
           <Table rowKey="sentence" dataSource={this.state[stateProperty]}
-                 columns={columns_dialog} pagination={{hideOnSinglePage: true}} size="small"
-                 expandedRowRender={record => <Table dataSource={record.context} pagination={{hideOnSinglePage: true}} columns={columns_context}/>} />
-        </div>                                                  
-      </div> : null 
+            columns={columns_dialog} pagination={{ hideOnSinglePage: true }} size="small"
+            expandedRowRender={record => <Table dataSource={record.context} pagination={{ hideOnSinglePage: true }} columns={columns_context} />} />
+        </div>
+      </div> : null
       }
-      <br/>    
+      <br />
     </>);
   }
-  
+
   _showDataConfig() {
-    const {formItemLayout} = this;
+    const { formItemLayout } = this;
     return (<>
-      <h3 style={{"padding-left": "1%"}}>Data</h3>
-      <p style={{"padding-left": "1%"}}>The data you want the workers to annotate.</p>
+      <h3 style={{ "padding-left": "1%" }}>Data</h3>
+      <p style={{ "padding-left": "1%" }}>The data you want the workers to annotate.</p>
       <div style={{
         border: "2px solid black",
         margin: "10px",
@@ -260,43 +257,43 @@ class QualityConfigure extends Configure {
         {this._showDataUpload(false)}
         {this._showAnnotationConfig("conversation", (this.state.quality_data || []).length)}
       </div>
-      
+
     </>);
   }
-  
-  _showButtons () {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+
+  _showButtons() {
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     return (<>
-      <div style={{"text-align": "center", "padding-left": "60px", "padding-top": "2%"}}>
-        <span style={{"margin-left": "-13%"}}>Please save before you preview</span>
+      <div style={{ "text-align": "center", "padding-left": "60px", "padding-top": "2%" }}>
+        <span style={{ "margin-left": "-13%" }}>Please save before you preview</span>
       </div>
       <FormItem {...formItemLayoutWithOutLabel}>
         <Button
-          type="primary" style={{width: '71.5%'}} htmlType="submit">Save</Button> {" "}
+          type="primary" style={{ width: '71.5%' }} htmlType="submit">Save</Button> {" "}
         <Button
           onClick={() => window.open(clientUrl + "/worker_quality?MID=dialcrowd&ID=" + this.props.session._id)}
-          style={{width: '18%'}}><Icon type='eye'/> Preview
+          style={{ width: '18%' }}><EyeOutlined /> Preview
         </Button>
 
-        <br/>
+        <br />
         {/* {this._showVisibility()} */}
-        <Button type="primary" style={{width: '90%'}}
-                onClick={() => this._saveAsJSON()}
+        <Button type="primary" style={{ width: '90%' }}
+          onClick={() => this._saveAsJSON()}
         >
           Save Configuration as JSON
         </Button>
 
-        <div style={{"padding-top": "2%"}}>
-          <QualityTemplate thisstate={this.props.session}/>
+        <div style={{ "padding-top": "2%" }}>
+          <QualityTemplate thisstate={this.props.session} />
         </div>
       </FormItem>
 
-      
+
     </>);
   }
 
-  _showTemplate () {}
+  _showTemplate() { }
 
 }
 

@@ -17,13 +17,15 @@
   },
   "homepage": "https://github.com/kyusonglee/dialcrowd#readme",
   "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "mongojs": "^3.1.0",
     "morgan": "^1.10.0",
     "npm": "^6.1.0",
     "password-hash": "^1.2.2",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^4.0.2",
     "socket.io": "^2.1.1",
     "uuid": "^3.1.0"
   },

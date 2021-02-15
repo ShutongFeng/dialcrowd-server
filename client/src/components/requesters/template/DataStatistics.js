@@ -1,18 +1,6 @@
-import React, {Component} from 'react'
-import {Table} from 'antd';
-import {PlusSquareOutlined, MinusSquareOutlined} from '@ant-design/icons';
-import {connect} from "react-redux";
-import queryString from 'query-string';
-import {clientUrl, serverUrl} from "../../../configs";
-import {loadData} from "../../../actions/sessionActions";
-import {Message} from 'react-chat-ui';
-import {new_project_data} from "../../../actions/crowdAction";
-import FileReaderInput from 'react-file-reader-input';
-import QuestionList, {lists2Questions, addKeys, DynamicItems} from "./QuestionList.js";
-import System, {lists2Systems} from "./System.js";
-import PreviewButton from "./PreviewButton.js";
-import {PreviewConsent} from "./Preview.js";
-
+import React, { Component } from 'react'
+import { Table } from 'antd';
+import { PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 
 class DataStatistics extends Component {
   /* Props:
@@ -47,7 +35,7 @@ class DataStatistics extends Component {
       key: "Cohen's Kappa"
     }
   ];
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       questions: [],
@@ -55,14 +43,14 @@ class DataStatistics extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.getResults();
     this.getStatistics();
     setInterval(() => this.getStatistics(), 5000);
     setInterval(() => this.getResults(), 5000);
   }
 
-  getStatistics () {
+  getStatistics() {
     /* Retrieve dataAgreements. */
     fetch(this.props.url).then(res => res.json()).then(res => {
       this.setState({
@@ -70,19 +58,19 @@ class DataStatistics extends Component {
         agreements: res.dataAgreements || [],
         task: res
       });
-    });    
+    });
   }
 
-  getResults () {
+  getResults() {
     /* Retrieve agreements for each individual task unit. */
     fetch(this.props.urlResult).then(res => res.json()).then(res => {
       this.setState({
         result: res
       });
-    });    
+    });
   }
-  
-  makeDataSource () {
+
+  makeDataSource() {
     if (this.state.task === undefined) {
       return undefined;
     }
@@ -90,7 +78,7 @@ class DataStatistics extends Component {
     // calculate mean of each agreement metric
     let mean = {};
     let dataSource = [];
-    if (this.state.agreements){
+    if (this.state.agreements) {
       for (const metric in this.state.agreements[0]) {
         mean[metric] = (this.state.agreements.map(x => x[metric]).reduce(
           (a, b) => (a + b), 0
@@ -109,21 +97,23 @@ class DataStatistics extends Component {
               fixedAgree[metric] = value.toFixed(3);
             }
           }
-          return {question: this.state.questions[index],
-                  units: this.makeSubDataSource(index),
-                  ...fixedAgree};
+          return {
+            question: this.state.questions[index],
+            units: this.makeSubDataSource(index),
+            ...fixedAgree
+          };
         }
       );
-      
+
       // Append mean to the last row.
       if (dataSource.length > 1) {
-        dataSource.push({...mean, question: <b>Average</b>});
+        dataSource.push({ ...mean, question: <b>Average</b> });
       }
     }
     return dataSource;
   }
 
-  makeSubDataSource (indexQuestion) {
+  makeSubDataSource(indexQuestion) {
     if (this.state.task === undefined || this.state.result === undefined) {
       return undefined;
     }
@@ -133,8 +123,8 @@ class DataStatistics extends Component {
     }
     let dataSource = [];
     for (const [idUnit, unit] of Object.entries(this.state.result.unit)) {
-      if (id2Unit[idUnit] === undefined) {continue;}
-      let agreements = {...unit.agreements[indexQuestion]};
+      if (id2Unit[idUnit] === undefined) { continue; }
+      let agreements = { ...unit.agreements[indexQuestion] };
       for (const metric in agreements) {
         if (agreements[metric] === null) {
           agreements[metric] = '-';
@@ -142,30 +132,30 @@ class DataStatistics extends Component {
           agreements[metric] = agreements[metric].toFixed(2);
         }
       }
-      let entry = {...agreements, ...id2Unit[idUnit]};
+      let entry = { ...agreements, ...id2Unit[idUnit] };
       dataSource.push(entry);
     }
     return dataSource;
   }
-  
-  render () {
-    const {columns, subColumns} = this.constructor;
+
+  render() {
+    const { columns, subColumns } = this.constructor;
     const dataSource = this.makeDataSource();
     const expandedRowRender = (
       // For interactive task, where subcolumns won't be given.
       subColumns === undefined ?
-      undefined
-      : record => <Table dataSource={record.units} columns={subColumns}
-                         pagination={{hideOnSinglePage: true}} />
+        undefined
+        : record => <Table dataSource={record.units} columns={subColumns}
+          pagination={{ hideOnSinglePage: true }} />
     );
-    const expandIcon = ({ expanded, onExpand, record}) => {
+    const expandIcon = ({ expanded, onExpand, record }) => {
       // Make the Average row not expandable.
       if (record.units !== undefined) {
         return expanded ? (
           <MinusSquareOutlined onClick={e => onExpand(record, e)} />
         ) : (
-          <PlusSquareOutlined onClick={e => onExpand(record, e)} />
-        )
+            <PlusSquareOutlined onClick={e => onExpand(record, e)} />
+          )
       } else {
         return undefined;
       }
@@ -174,46 +164,46 @@ class DataStatistics extends Component {
     const hasCohensKappa = columns.map(c => c.title).indexOf("Cohen's Kappa") != -1;
     return (<>
       <Table dataSource={dataSource} columns={columns}
-             expandedRowRender={expandedRowRender}
-             expandIcon={expandIcon}
-             pagination={{hideOnSinglePage: true}}
+        expandedRowRender={expandedRowRender}
+        expandIcon={expandIcon}
+        pagination={{ hideOnSinglePage: true }}
       />
-      <br/>
-      {hasCohensKappa ? this.showCohensColorCode(): null}
+      <br />
+      {hasCohensKappa ? this.showCohensColorCode() : null}
     </>);
   }
 
-  showCohensColorCode () {
+  showCohensColorCode() {
     return (<>
       <div> Cohen's Kappa indicates worker agreement of different levels:
         <ul>
-          <li> <span style={{color: "#595959", "font-weight": "bold"}}> {"< 0.00"} </span> : Poor </li>
-          <li> <span style={{color: "#940004", "font-weight": "bold"}}> 0.00 - 0.20 </span> : Slight </li>
-          <li> <span style={{color: "#d15700", "font-weight": "bold"}}> 0.20 - 0.40 </span> : Fair </li>
-          <li> <span style={{color: "#e6b314", "font-weight": "bold"}}> 0.40 - 0.60 </span> : Moderate </li>
-          <li> <span style={{color: "#90ad00", "font-weight": "bold"}}> 0.60 - 0.80 </span> : Substantial </li>
-          <li> <span style={{color: "#00b31a", "font-weight": "bold"}}> 0.80 - 1.00 </span> : Almost Perfect </li>
+          <li> <span style={{ color: "#595959", "font-weight": "bold" }}> {"< 0.00"} </span> : Poor </li>
+          <li> <span style={{ color: "#940004", "font-weight": "bold" }}> 0.00 - 0.20 </span> : Slight </li>
+          <li> <span style={{ color: "#d15700", "font-weight": "bold" }}> 0.20 - 0.40 </span> : Fair </li>
+          <li> <span style={{ color: "#e6b314", "font-weight": "bold" }}> 0.40 - 0.60 </span> : Moderate </li>
+          <li> <span style={{ color: "#90ad00", "font-weight": "bold" }}> 0.60 - 0.80 </span> : Substantial </li>
+          <li> <span style={{ color: "#00b31a", "font-weight": "bold" }}> 0.80 - 1.00 </span> : Almost Perfect </li>
         </ul>
       </div>
     </>);
   }
 }
 
-function renderWithColor (score) {
+function renderWithColor(score) {
   let color;
   score = parseFloat(score);
   if (score < 0 || isNaN(score)) { color = '#595959'; }
-  else if (score < 0.2 ) { color = '#940004'; }
-  else if (score < 0.4 ) { color = '#d15700'; }
-  else if (score < 0.6 ) { color = '#e6b314'; }
-  else if (score < 0.8 ) { color = '#90ad00'; }
+  else if (score < 0.2) { color = '#940004'; }
+  else if (score < 0.4) { color = '#d15700'; }
+  else if (score < 0.6) { color = '#e6b314'; }
+  else if (score < 0.8) { color = '#90ad00'; }
   else { color = '#00b31a'; }
   return {
     props: {},
-    children: <span style={{color: color, "font-weight": "bold"}}> {score} </span>
+    children: <span style={{ color: color, "font-weight": "bold" }}> {score} </span>
   };
 }
 
 
 export default DataStatistics;
-export {renderWithColor};
+export { renderWithColor };

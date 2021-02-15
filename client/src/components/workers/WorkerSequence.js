@@ -1,15 +1,15 @@
 import React from "react";
-import {Button, Collapse, Form, Icon, Input, Modal, Rate, Table, Radio} from 'antd';
+import { Button, Collapse, Form, Modal, Table, Radio } from 'antd';
+import { DeleteOutlined, SelectOutlined } from '@ant-design/icons'
 import TextEditor from './TextEditor'
-import {ConsentForm, AnonymityNotice} from "./AgreeModal";
-import {serverUrl} from "../../configs";
+import { ConsentForm } from "./AgreeModal";
+import { serverUrl } from "../../configs";
 import queryString from 'query-string';
-import QuestionList, {Markdown} from "./QuestionList.js"
-import {lists2Questions, addKeys} from "../requesters/template/QuestionList.js"
-import {lists2Systems} from "../requesters/template/System.js"
-import {_renderExamples} from "./WorkerInteractive.js"
-import {showFeedbackQuestion} from "./QuestionList.js";
-import {getStyle} from "./style.js";
+import { Markdown } from "./QuestionList.js"
+import { lists2Questions, addKeys } from "../requesters/template/QuestionList.js"
+import { _renderExamples } from "./WorkerInteractive.js"
+import { showFeedbackQuestion } from "./QuestionList.js";
+import { getStyle } from "./style.js";
 
 
 const confirm = Modal.confirm;
@@ -23,10 +23,10 @@ function getQuestion(t, id) {
     })
     .then(function (json) {
       if (json.err !== undefined) {
-        Modal.error({content: json.err});
+        Modal.error({ content: json.err });
         return;
       }
-      
+
       let questionEntities;
       if (json.questionEntities === undefined) {
         const labels = json.Label || [];
@@ -141,16 +141,16 @@ class WorkerSequence extends React.Component {
       ID = params.ID;
     }
     var time = Date.now();
-    this.setState({userID: time});
-    this.setState({MID: mid});
-    this.setState({ID: ID});
+    this.setState({ userID: time });
+    this.setState({ MID: mid });
+    this.setState({ ID: ID });
     getQuestion(this, ID);
   }
 
   async retrieveQuestion(values) {
     await SubmitFromUser(this, values);
     // await getQuestion(this, this.state.ID);
-    this.setState({Orgs: []});
+    this.setState({ Orgs: [] });
   }
 
   handleSubmit = (e) => {
@@ -158,7 +158,7 @@ class WorkerSequence extends React.Component {
 
     let feedback = [];
     this.props.form.validateFields((err, values) => {
-      if (!err){
+      if (!err) {
         feedback = values;
       }
     })
@@ -172,7 +172,7 @@ class WorkerSequence extends React.Component {
     };
     this.annotations.push(values);
     if (this.state.current < this.state.numofhit) {
-      this.setState({current: this.state.current + 1, Orgs: []});
+      this.setState({ current: this.state.current + 1, Orgs: [] });
     } else {
       SubmitFromUser(this, this.annotations);
       confirm({
@@ -184,7 +184,7 @@ class WorkerSequence extends React.Component {
         },
       });
     }
-    this.setState({isFirst: false});
+    this.setState({ isFirst: false });
   }
 
   // changeTab = activeKey => {
@@ -196,7 +196,7 @@ class WorkerSequence extends React.Component {
   // }
 
   openInstructions = () => {
-    if (!(this.state.activeKey.includes("2"))){
+    if (!(this.state.activeKey.includes("2"))) {
       let x = this.state.activeKey;
       x.push("2");
       this.setState({
@@ -216,7 +216,7 @@ class WorkerSequence extends React.Component {
       var selecter = window.getSelection();
       if (selecter !== null && selecter !== "") {
         console.log(selecter);
-        this.setState({selecttext: selecter.toString()});
+        this.setState({ selecttext: selecter.toString() });
         console.log("demo: " + selecter);
       }
 
@@ -230,10 +230,10 @@ class WorkerSequence extends React.Component {
     if (window.getSelection) {
       var userSelection = window.getSelection();
     }
-    this.setState({selectorStart: selecter.anchorOffset})
-    this.setState({selectorEnd: selecter.focusOffset})
-    if (this.state.isFirst || isNaN(parseInt(this.state.time))){
-      this.setState({time: Date.now()})
+    this.setState({ selectorStart: selecter.anchorOffset })
+    this.setState({ selectorEnd: selecter.focusOffset })
+    if (this.state.isFirst || isNaN(parseInt(this.state.time))) {
+      this.setState({ time: Date.now() })
     }
   }
 
@@ -245,11 +245,11 @@ class WorkerSequence extends React.Component {
       "end": this.state.selectorEnd,
       "Id": Date.now(),
       "text": this.state.data[this.state.current - 1].sentence,
-      entities: [{"start": this.state.selectorStart, "end": this.state.selectorEnd, "entity": arg}]
+      entities: [{ "start": this.state.selectorStart, "end": this.state.selectorEnd, "entity": arg }]
     };
     var temp = this.state.Orgs;
     temp.push(instance);
-    this.setState({Orgs: temp});
+    this.setState({ Orgs: temp });
     console.log(this.state.Orgs);
 
     if (document.all) {
@@ -276,11 +276,11 @@ class WorkerSequence extends React.Component {
     if (index > -1) {
       temp.splice(index, 1);
     }
-    this.setState({Orgs: temp});
+    this.setState({ Orgs: temp });
   };
 
   render() {
-    const {current} = this.state;
+    const { current } = this.state;
 
     const columns_example = [{
       title: 'Type',
@@ -330,7 +330,7 @@ class WorkerSequence extends React.Component {
           <span className="table-operation">
             {
               <span>
-                <a onClick={() => this.deleteEnt(record.Id)}><Icon type="delete"/> delete</a>
+                <a onClick={() => this.deleteEnt(record.Id)}><DeleteOutlined /> delete</a>
               </span>
             }
           </span>
@@ -343,11 +343,11 @@ class WorkerSequence extends React.Component {
       labelCol: { span: 10 },
       wrapperCol: { span: 7 },
       colon: false
-    };  
+    };
     const formItemLayout = {
-      wrapperCol: {span: 10},
+      wrapperCol: { span: 10 },
       colon: false
-  }
+    }
     const radioStyle = {
       display: 'block',
       height: '30px',
@@ -363,8 +363,8 @@ class WorkerSequence extends React.Component {
     });
 
     return <div style={styles.global}>
-      <Form onSubmit={this.handleSubmit} style={{"marginBottom": 0.6}}>
-        <Collapse defaultActiveKey={['1', '2']}  activeKey={this.state.activeKey} onChange={this.changeTab}>
+      <Form onSubmit={this.handleSubmit} style={{ "marginBottom": 0.6 }}>
+        <Collapse defaultActiveKey={['1', '2']} activeKey={this.state.activeKey} onChange={this.changeTab}>
           <Collapse.Panel header="Background" key="1" style={styles.tabTitle}>
             <p style={styles.background}>
               <Markdown enableMarkdown={this.state.enableMarkdown}>
@@ -377,9 +377,9 @@ class WorkerSequence extends React.Component {
           <Collapse.Panel header="Instructions" key="2" style={styles.tabTitle}>
             <div style={styles.instruction}>
               {this.state.enableMarkdown ?
-               <Markdown enableMarkdown={this.state.enableMarkdown}>
-                 {this.state.generic_instructions}
-               </Markdown> : <b>{this.state.generic_instructions}</b>
+                <Markdown enableMarkdown={this.state.enableMarkdown}>
+                  {this.state.generic_instructions}
+                </Markdown> : <b>{this.state.generic_instructions}</b>
               }
             </div>
             <p style={{
@@ -390,62 +390,64 @@ class WorkerSequence extends React.Component {
             }}>
               We expect this HIT will take <b>{this.state.timepay} minute(s)</b> and we will pay <b>${this.state.payment}</b>.
             </p>
-            <div style={{...styles.example, "fontSize": styles.example.fontSize + 4}}>
+            <div style={{ ...styles.example, "fontSize": styles.example.fontSize + 4 }}>
               <p><b>Examples</b></p>
             </div>
             <Table rowKey="sentid"
-                   dataSource={this.state.questionEntities}
-                   columns={columns_example} size="small"
-                   style={{...styles.example, marginBottom: `${styles.global.spacing}px`}} />
+              dataSource={this.state.questionEntities}
+              columns={columns_example} size="small"
+              style={{ ...styles.example, marginBottom: `${styles.global.spacing}px` }} />
           </Collapse.Panel>
           <Collapse.Panel header="Sequence Labeling" key="3" style={styles.tabTitle}>
 
             <div
               title="Select the text that you recognize as an entity and choose the corresponding type of entity using the buttons below.">
               <div>
-                <p style={{"textAlign": "center", "fontSize": 18, marginTop: `${styles.global.spacing}px`}}>
+                <p style={{ "textAlign": "center", "fontSize": 18, marginTop: `${styles.global.spacing}px` }}>
                   <b>Select the text that you recognize as an entity and choose the corresponding type of entity using the
                     buttons below.</b></p>
               </div>
-              <div style={{"textAlign": "center",
-                           marginTop: `${styles.global.spacing}px`,
-                           marginBottom: `${10 + styles.global.spacing}px`}}>
+              <div style={{
+                "textAlign": "center",
+                marginTop: `${styles.global.spacing}px`,
+                marginBottom: `${10 + styles.global.spacing}px`
+              }}>
                 <Button type="default" onClick={this.openInstructions}>Example Responses</Button>
               </div>
               {this.state.flag ?
-               this.state.data.slice(this.state.current - 1, this.state.current).map((item, i) => (
-                 <div>
-                   <p style={styles.utterance} onClick={this.SelectText}>{item.sentence}</p>
-                   {labels.map((label, j) => (
-                     <Button type="primary" style={{"marginLeft": "10px"}}
-                             onClick={() => this.clickEntity(label)}><Icon type="select"/>{label}</Button>
-                   ))}
-                 </div>
-               ))
-              :
-               null
+                this.state.data.slice(this.state.current - 1, this.state.current).map((item, i) => (
+                  <div>
+                    <p style={styles.utterance} onClick={this.SelectText}>{item.sentence}</p>
+                    {labels.map((label, j) => (
+                      <Button type="primary" style={{ "marginLeft": "10px" }}
+                        onClick={() => this.clickEntity(label)}><SelectOutlined />{label}</Button>
+                    ))}
+                  </div>
+                ))
+                :
+                null
               }
             </div>
 
-            <div title="Annotations" style={{"marginTop": `${20 + styles.global.spacing}px`}}>
+            <div title="Annotations" style={{ "marginTop": `${20 + styles.global.spacing}px` }}>
               <Table dataSource={this.state.Orgs} columns={columns} size="small" pagination={false}
-                     style={styles.answer} />
+                style={styles.answer} />
             </div>
-            <div style={{"backgroundColor": "#C1E7F8"}}>
-              <FormItem style={{"textAlign": "center"}}
-                        wrapperCol={{span: 12, offset: 6}}
+            <div style={{ "backgroundColor": "#C1E7F8" }}>
+              <FormItem style={{ "textAlign": "center" }}
+                wrapperCol={{ span: 12, offset: 6 }}
               >
-                <p style={{"textAlign": "center", "fontSize": 15, "color": "black"}}>You will get the code after you finish
+                <p style={{ "textAlign": "center", "fontSize": 15, "color": "black" }}>You will get the code after you finish
                   everything</p>
                 {current < this.state.numofhit ?
-                           <Button type="primary" htmlType="submit">Next {current}/{this.state.numofhit}</Button>
-                :
-                           <>
-                             {showFeedbackQuestion(this.state.hasFeedbackQuestion, getFieldDecorator)}             
-                             <div style={{"margin-top": `${-20+styles.global.spacing}px`}}>
-                               <Button type="primary" htmlType="submit">Submit</Button>
-                             </div>
-                           </>
+                  <Button type="primary" htmlType="submit">Next {current}/{this.state.numofhit}</Button>
+                  :
+                  <>
+                    {showFeedbackQuestion(this.state.hasFeedbackQuestion, getFieldDecorator)}
+                    <div style={{ "margin-top": `${-20 + styles.global.spacing}px` }}>
+                      <Button type="primary" htmlType="submit">Submit</Button>
+                    </div>
+                  </>
                 }
               </FormItem>
             </div>

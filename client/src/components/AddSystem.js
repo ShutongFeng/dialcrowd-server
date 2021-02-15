@@ -1,8 +1,8 @@
 import React from "react";
-import { Button, Divider, Drawer, Icon, Input, message, Popconfirm, Table } from 'antd';
+import { Button, Divider, Drawer, Input, message, Popconfirm, Table } from 'antd';
 import { connect } from "react-redux";
 import Highlighter from 'react-highlight-words';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, GithubOutlined, EditOutlined, MessageOutlined, FolderAddOutlined } from '@ant-design/icons';
 import NewSystem from "./NewSystem";
 import HelpConnectSystem from "./help/HelpConnectSystem";
 import Iframe from 'react-iframe'
@@ -227,7 +227,7 @@ class AddSystem extends React.Component {
       render: (text, record) => (
         <span>
           <Button shape={"circle"} disabled={!record.github}>
-            <a href={record.github} target={"_blank"}><Icon type="github" /></a>
+            <a href={record.github} target={"_blank"}><GithubOutlined /></a>
           </Button>
           <Divider type="vertical" />
           <Popconfirm title={
@@ -240,11 +240,11 @@ class AddSystem extends React.Component {
                 onChange={this.onChangeInput}
               />
             </span>} onConfirm={() => this.confirm(record)} onCancel={this.cancel} okText="Yes" cancelText="No">
-            <Button shape={"circle"}><Icon type="edit" /></Button>
+            <Button shape={"circle"}><EditOutlined /></Button>
           </Popconfirm>
           <Divider type="vertical" />
           <Button shape={"circle"} onClick={() => this.showDrawer(record.url)}>
-            <Icon type="message" />
+            <MessageOutlined />
           </Button>
         </span>
       ),
@@ -268,7 +268,7 @@ class AddSystem extends React.Component {
       </Drawer>
       <div style={{ display: "flex" }}>
         <Button onClick={this.showbotconfigure}>
-          <Icon type="folder-add" />Create
+          <FolderAddOutlined />Create
         </Button>
 
         <HelpConnectSystem />

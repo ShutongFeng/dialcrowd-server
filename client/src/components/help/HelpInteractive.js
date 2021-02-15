@@ -1,5 +1,7 @@
 import React from "react";
-import { Button, Drawer, Icon, Row, Tabs } from 'antd'
+import { Button, Drawer, Row, Tabs } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons'
+
 import ReactMarkdown from 'react-markdown';
 
 const TabPane = Tabs.TabPane;
@@ -35,7 +37,7 @@ class HelpInteractive extends React.Component {
     return (
       <div>
         <Button type="primary" style={{ float: "right", "marginLeft": "10px" }} onClick={this.showDrawer}>
-          <Icon type="question-circle-o" />Help
+          <QuestionCircleOutlined />Help
           </Button>
         <br></br>
         <br></br>

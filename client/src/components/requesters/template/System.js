@@ -1,22 +1,21 @@
 import React from "react";
-import {Form, Icon, Input, Radio, Select, Tooltip, Button} from 'antd'
-import {MinusCircleOutlined, ExclamationCircleOutlined} from '@ant-design/icons'
-import {connect} from "react-redux";
+import { Form, Input, Select, Tooltip, Button } from 'antd'
+import { QuestionCircleOutlined, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import QuestionList from "./QuestionList.js"
 
 
-function lists2Systems (names, instructions, queries, types,
-                        exampless, counterexampless) {
+function lists2Systems(names, instructions, queries, types,
+  exampless, counterexampless) {
   const _addKey = (xs) => (
     xs.filter((x) => (x !== null))
-      .map((x, i) => ({key: i, content: x}))
+      .map((x, i) => ({ key: i, content: x }))
   );
   let systems = [];
   for (let i = 0; i < names.length; i += 1) {
     // Workaround: in case exampless[i] is not an array.
-    let examples = Array.isArray(exampless[i]) ? exampless[i]: [exampless[i]];
+    let examples = Array.isArray(exampless[i]) ? exampless[i] : [exampless[i]];
     let counterexamples = (
-      Array.isArray(exampless[i]) ? counterexampless[i]: [counterexampless[i]]
+      Array.isArray(exampless[i]) ? counterexampless[i] : [counterexampless[i]]
     );
 
     systems.push({
@@ -57,8 +56,8 @@ class System extends React.Component {
   render() {
     const formItemLayoutWithOutLabel = {
       wrapperCol: {
-        xs: {span: 24, offset: 0},
-        sm: {span: 20, offset: 4},
+        xs: { span: 24, offset: 0 },
+        sm: { span: 20, offset: 4 },
       },
     };
 
@@ -72,8 +71,8 @@ class System extends React.Component {
           }
         </div>
         <Form.Item {...formItemLayoutWithOutLabel}>
-          <Button type="dashed" onClick={this.addSystem} style={{width: '90%'}}>
-            <Icon type="plus"/> Add System
+          <Button type="dashed" onClick={this.addSystem} style={{ width: '90%' }}>
+            <PlusOutlined /> Add System
           </Button>
         </Form.Item>
       </>
@@ -84,50 +83,51 @@ class System extends React.Component {
     this.props.addByKey([this.props.fieldNameSystem], this.constructor.newSystem());
   }
 
-  static newSystem () {
+  static newSystem() {
     /* Factory a new empty initialized system object. */
     return {
       name: "",
       agent: "",
       instruction: "",
       questions: [
-        {key: 0, ...QuestionList.newQuestion()}
+        { key: 0, ...QuestionList.newQuestion() }
       ]
     };
   }
 
-  _showSystem (system) {
-    const {formItemLayout, fieldNameSystem} = this.props;
-    const {getFieldDecorator} = this.props.form;
+  _showSystem(system) {
+    const { formItemLayout, fieldNameSystem } = this.props;
+    const { getFieldDecorator } = this.props.form;
     return (
       <div key={system.key}
-           style={{border: "2px solid black", margin: "10px", padding: 24, display: "block"}}
+        style={{ border: "2px solid black", margin: "10px", padding: 24, display: "block" }}
       >
 
         {/* instruction tooltip that show instruction when mouse hovering over it. */}
-        <span style={{float: "left",
-                      "margin-bottom": "-30px"}}
-              class="instruction-tooltip">
+        <span style={{
+          float: "left",
+          "margin-bottom": "-30px"
+        }}
+          class="instruction-tooltip">
           <Tooltip
             title={this.props.textInstruction}>
-            <Icon type="question-circle-o"/> &nbsp; Tips
+            <QuestionCircleOutlined /> &nbsp; Tips
           </Tooltip>
         </span>
 
         {/* Removal Button */}
         <Form.Item>
-          <span style={{float: "right", "margin-bottom": "-30px", "margin-top": "-20px", "margin-right": "-10px"}}>
+          <span style={{ float: "right", "margin-bottom": "-30px", "margin-top": "-20px", "margin-right": "-10px" }}>
             {this.props.systems.length > 1 ? (
-              <Icon
+              <MinusCircleOutlined
                 className="dynamic-delete-button"
-                type="minus-circle-o"
                 disabled={this.props.systems.length === 1}
                 onClick={() => this.props.removeByKey([fieldNameSystem, system.key])}
               />
             ) : null}
           </span>
         </Form.Item>
-        
+
         {/* System name. */}
         <Form.Item
           {...formItemLayout}
@@ -140,7 +140,7 @@ class System extends React.Component {
                   + "'Baseline' or 'Proposed System'.  This name will be shown "
                   + "to workers (e.g., System A)"
                 )}>
-                <Icon type="question-circle-o"/>
+                <QuestionCircleOutlined />
               </Tooltip>
             </span>
           )}
@@ -155,7 +155,7 @@ class System extends React.Component {
               message: "Please input the name of the dialog system to show to workers.",
             }],
           })(
-            <Input placeholder="System A" style={{width: '90%', marginRight: 8}}/>
+            <Input placeholder="System A" style={{ width: '90%', marginRight: 8 }} />
           )}
         </Form.Item>
 
@@ -168,7 +168,7 @@ class System extends React.Component {
           {getFieldDecorator(`${fieldNameSystem}[${system.key}][agent]`, {
             initialValue: system.agent,
             rules: [
-              {required: true, message: 'Please select an agent!'},
+              { required: true, message: 'Please select an agent!' },
             ],
           })(
             <Select placeholder="Please choose your system">
@@ -191,7 +191,7 @@ class System extends React.Component {
                   + "(e.g., 'please interact with the system for more "
                   + "than 10 turns', 'please ask about the weather tomorrow in Pittsburgh', etc)"
                 )}>
-                <Icon type="question-circle-o"/>
+                <QuestionCircleOutlined />
               </Tooltip>
             </span>
           )}
@@ -207,7 +207,7 @@ class System extends React.Component {
             }],
           })(
             <Input placeholder="Please talk about weather and more than 10 turns! "
-                   style={{width: '90%', marginRight: 8}}/>
+              style={{ width: '90%', marginRight: 8 }} />
           )}
         </Form.Item>
         <QuestionList
@@ -238,5 +238,5 @@ class System extends React.Component {
 
 
 export default System;
-export {lists2Systems};
+export { lists2Systems };
 

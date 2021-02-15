@@ -1,8 +1,9 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import MaterialIcon from 'material-icons-react'
-import {sendFeedback} from '../../actions/messageActions'
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import ThumbDownIcon from '@material-ui/icons/ThumbDown';
+import { sendFeedback } from '../../actions/messageActions'
 
 class Review extends React.Component {
   constructor(props) {
@@ -16,17 +17,17 @@ class Review extends React.Component {
   render() {
     return <div className="review">
       <div
-          className="reviewButton"
-          onClick={this.thumbUp.bind(this)}
+        className="reviewButton"
+        onClick={this.thumbUp.bind(this)}
       >
-        <MaterialIcon icon="thumb_up" color={this.state.up ? "#0097e6" : "#353b48"}/>
+        <ThumbUpIcon color={this.state.up ? "#0097e6" : "#353b48"} />
       </div>
 
       <div
-          className="reviewButton"
-          onClick={this.thumbDown.bind(this)}
+        className="reviewButton"
+        onClick={this.thumbDown.bind(this)}
       >
-        <MaterialIcon icon="thumb_down" color={this.state.down ? "#0097e6" : "#353b48"}/>
+        <ThumbDownIcon color={this.state.down ? "#0097e6" : "#353b48"} />
       </div>
     </div>
   }

@@ -1,12 +1,12 @@
 import React from "react";
-import {Button, Divider, Icon, Input, message, Modal, Popconfirm, Spin, Table} from 'antd';
-import {connect} from 'react-redux';
+import { Button, Divider, Input, message, Modal, Popconfirm, Spin, Table } from 'antd';
+import { connect } from 'react-redux';
 import Highlighter from 'react-highlight-words';
-import {SearchOutlined} from '@ant-design/icons';
-import {serverUrl} from "../configs"
-import {loadData} from "../actions/sessionActions";
-import {deleteProject} from "../actions/crowdAction";
-import {Form} from "antd/lib/index";
+import { SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { serverUrl } from "../configs"
+import { loadData } from "../actions/sessionActions";
+import { deleteProject } from "../actions/crowdAction";
+import { Form } from "antd/lib/index";
 
 class ProjectList extends React.Component {
   constructor(props) {
@@ -36,7 +36,7 @@ class ProjectList extends React.Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({password: this.state.password})
+      body: JSON.stringify({ password: this.state.password })
     });
     const response = await rawResponse.json();
     // `response` will be null if the password is incorrect.
@@ -44,44 +44,44 @@ class ProjectList extends React.Component {
       response.password = this.state.password;
       await this.props.dispatchUpdate(this.props.url, response);
       // hide modal
-      this.setState({loading: false, visible: false, password: ""});
+      this.setState({ loading: false, visible: false, password: "" });
       // navigate to the config page
       this.props.history.replace('/' + this.props.url);
-    } else {      
+    } else {
       message.error('Please check the password!');
     }
   }
 
   handleCancel = () => {
-    this.setState({visible: false});
+    this.setState({ visible: false });
   }
 
   async go(createdAt) {
-    this.setState({visible: true, createdAt: createdAt});
+    this.setState({ visible: true, createdAt: createdAt });
   }
 
 
   onChangePassword = (e) => {
-    this.setState({password: e.target.value});
+    this.setState({ password: e.target.value });
   }
 
   confirm = (e) => {
     if (e["password"] === this.state.inputText || true) {
       message.success('Delete Success');
       this.props.deleteProject(this.props.url, e["_id"], this.state.inputText);
-      this.setState({inputText: ""});
+      this.setState({ inputText: "" });
     }
     else {
       message.error('Please check your password or contact: kyusongleegmail.com');
-      this.setState({inputText: ""});
+      this.setState({ inputText: "" });
     }
   }
 
   cancel = (e) => {
-    this.setState({inputText: ""});
+    this.setState({ inputText: "" });
   }
   onChangeInput = (e) => {
-    this.setState({inputText: e.target.value});
+    this.setState({ inputText: e.target.value });
   };
 
   //https://ant.design/components/table/
@@ -93,7 +93,7 @@ class ProjectList extends React.Component {
           ref={node => {
             this.searchInput = node;
           }}
-          placeholder={dataIndex !== 'nickname' ? `Search project`: `Search creator`}
+          placeholder={dataIndex !== 'nickname' ? `Search project` : `Search creator`}
           value={selectedKeys[0]}
           onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
@@ -133,8 +133,8 @@ class ProjectList extends React.Component {
           textToHighlight={text.toString()}
         />
       ) : (
-        text
-      ),
+          text
+        ),
   });
 
   handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -151,12 +151,12 @@ class ProjectList extends React.Component {
   };
 
   render() {
-    const {data} = this.props
-    const {visible, loading} = this.state;
+    const { data } = this.props
+    const { visible, loading } = this.state;
 
     // preemptively sort the table
-    if (data.length > 0){
-      data.sort(function(a, b){
+    if (data.length > 0) {
+      data.sort(function (a, b) {
         return a.name.localeCompare(b.name);
       })
     }
@@ -165,7 +165,8 @@ class ProjectList extends React.Component {
       {
         title: 'ID', dataIndex: 'createdAt', key: 'createdAt',
       },
-      {title: 'Project Name', dataIndex: 'name', key: 'name',
+      {
+        title: 'Project Name', dataIndex: 'name', key: 'name',
         sorter: (a, b) => {
           return a.name.localeCompare(b.name);
         },
@@ -183,23 +184,23 @@ class ProjectList extends React.Component {
         dataIndex: 'operation',
         key: 'operation',
         render: (text, record) => (
-            <span className="table-operation">
+          <span className="table-operation">
             {
               <span>
-                <a onClick={() => this.go(record.createdAt)}><Icon type="edit"/></a>
-                      <Divider type="vertical"/>
+                <a onClick={() => this.go(record.createdAt)}><EditOutlined /></a>
+                <Divider type="vertical" />
                 <Popconfirm title={
                   <span>
                     <h1>Are you abolutely sure?</h1>
                     <p>"Please type in the password of this task to confirm."</p>
-                  <Input
+                    <Input
                       placeholder="Password"
                       value={this.state.inputText}
                       onChange={this.onChangeInput}
-                  />
-                </span>} onConfirm={() => this.confirm(record)} onCancel={this.cancel} okText="Yes" cancelText="No">
-                <a><Icon type="delete"/></a>
-                  </Popconfirm>
+                    />
+                  </span>} onConfirm={() => this.confirm(record)} onCancel={this.cancel} okText="Yes" cancelText="No">
+                  <a><DeleteOutlined /></a>
+                </Popconfirm>
 
 
               </span>
@@ -211,40 +212,40 @@ class ProjectList extends React.Component {
 
     return (
 
-        this.state.isload ?
-            <Spin tip="Loading...">
-              <Table
-                  columns={columns}
-                  rowKey='createdAt'
-                  dataSource={data}
-              />
-            </Spin>
-            :
-            <div>
-              <Table
-                  columns={columns}
-                  rowKey='createdAt'
-                  bordered
-                  dataSource={data}
-                  size={'small'}
-              />
-              <Modal
-                  visible={visible}
-                  title="Enter Password"
-                  onOk={this.handleOk}
-                  onCancel={this.handleCancel}
-                  footer={[
-                    <Button key="back" onClick={this.handleCancel}>Return</Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={this.handleOk}> Submit</Button>,
-                  ]}
-              >
-                <Input
-                    type="password"
-                    placeholder="Enter the password"
-                    onChange={this.onChangePassword}
-                />
-              </Modal>
-            </div>
+      this.state.isload ?
+        <Spin tip="Loading...">
+          <Table
+            columns={columns}
+            rowKey='createdAt'
+            dataSource={data}
+          />
+        </Spin>
+        :
+        <div>
+          <Table
+            columns={columns}
+            rowKey='createdAt'
+            bordered
+            dataSource={data}
+            size={'small'}
+          />
+          <Modal
+            visible={visible}
+            title="Enter Password"
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            footer={[
+              <Button key="back" onClick={this.handleCancel}>Return</Button>,
+              <Button key="submit" type="primary" loading={loading} onClick={this.handleOk}> Submit</Button>,
+            ]}
+          >
+            <Input
+              type="password"
+              placeholder="Enter the password"
+              onChange={this.onChangePassword}
+            />
+          </Modal>
+        </div>
 
     );
   }

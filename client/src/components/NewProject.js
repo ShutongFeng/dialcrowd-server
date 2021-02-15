@@ -1,9 +1,10 @@
 import React from "react";
-import {Button, Form, Icon, Input, Modal, Tooltip,} from 'antd'
-import {serverUrl} from "../configs";
-import {message} from "antd/lib/index";
-import {new_project_data} from "../actions/crowdAction";
-import {connect} from "react-redux";
+import { Button, Form, Input, Modal, Tooltip, } from 'antd'
+import { FolderAddOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { serverUrl } from "../configs";
+import { message } from "antd/lib/index";
+import { new_project_data } from "../actions/crowdAction";
+import { connect } from "react-redux";
 
 const FormItem = Form.Item;
 
@@ -17,18 +18,18 @@ function Submit(t, data, id) {
     },
     body: JSON.stringify(data)
   })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (json) {
-        if (json.message === "success") {
-          message.success("Success");
-          t.props.new_project_data(t.props.project);
-        }
-        else {
-          message.success("Fail");
-        }
-      });
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (json) {
+      if (json.message === "success") {
+        message.success("Success");
+        t.props.new_project_data(t.props.project);
+      }
+      else {
+        message.success("Fail");
+      }
+    });
 }
 
 
@@ -49,7 +50,7 @@ class NewProject extends React.Component {
 
   handleConfirmBlur = (e) => {
     const value = e.target.value;
-    this.setState({confirmDirty: this.state.confirmDirty || !!value});
+    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
   }
   checkPassword = (rule, value, callback) => {
     const form = this.props.form;
@@ -62,7 +63,7 @@ class NewProject extends React.Component {
   checkConfirm = (rule, value, callback) => {
     const form = this.props.form;
     if (value && this.state.confirmDirty) {
-      form.validateFields(['confirm'], {force: true});
+      form.validateFields(['confirm'], { force: true });
     }
     callback();
   }
@@ -110,93 +111,93 @@ class NewProject extends React.Component {
 
 
   render() {
-    const {getFieldDecorator} = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
-      labelCol: {span: 8},
-      wrapperCol: {span: 14},
+      labelCol: { span: 8 },
+      wrapperCol: { span: 14 },
     };
 
     return (
-        <div>
-          <Button
-              onClick={this.showModal}>
-            <Icon type='folder-add'/> New Project
+      <div>
+        <Button
+          onClick={this.showModal}>
+          <FolderAddOutlined /> New Project
           </Button>
-          <Modal
-              title="New Project"
-              visible={this.state.visible}
-              onOk={this.hideModal}
-              onCancel={this.cancelModal}
-              okText="New Project"
-              cancelText="Cancel"
-          >
-            <Form onSubmit={this.handleSubmit}>
-              <FormItem
-                  {...formItemLayout}
-                  label={(
-                      <span>
+        <Modal
+          title="New Project"
+          visible={this.state.visible}
+          onOk={this.hideModal}
+          onCancel={this.cancelModal}
+          okText="New Project"
+          cancelText="Cancel"
+        >
+          <Form onSubmit={this.handleSubmit}>
+            <FormItem
+              {...formItemLayout}
+              label={(
+                <span>
                   Project name&nbsp;
-                        <Tooltip title="Please input the project. ">
-                    <Icon type="question-circle-o"/>
+                  <Tooltip title="Please input the project. ">
+                    <QuestionCircleOutlined />
                   </Tooltip>
                 </span>
-                  )}
-                  hasFeedback
-              >
-                {getFieldDecorator('project', {
-                  rules: [{required: true, message: 'Please input the project!', whitespace: true}],
-                })(
-                    <Input/>
-                )}
-              </FormItem>
-              <FormItem
-                  {...formItemLayout}
-                  label={(
-                      <span>
-              Creator&nbsp;
-                        <Tooltip title="You can find your project by your creator name">
-                <Icon type="question-circle-o"/>
-              </Tooltip>
-            </span>
-                  )}
-              >
-                {getFieldDecorator('nickname', {
-                  rules: [{required: true, message: 'Please input your creator name!', whitespace: true}],
-                })(
-                    <Input/>
-                )}
-              </FormItem>
-              <FormItem
-                  {...formItemLayout}
-                  label="Password"
-              >
-                {getFieldDecorator('password', {
-                  rules: [{
-                    required: true, message: 'Please input your password!',
-                  }, {
-                    validator: this.checkConfirm,
-                  }],
-                })(
-                    <Input type="password"/>
-                )}
-              </FormItem>
-              <FormItem
-                  {...formItemLayout}
-                  label="Confirm Password"
-              >
-                {getFieldDecorator('confirm', {
-                  rules: [{
-                    required: true, message: 'Please confirm your password!',
-                  }, {
-                    validator: this.checkPassword,
-                  }],
-                })(
-                    <Input type="password" onBlur={this.handleConfirmBlur}/>
-                )}
-              </FormItem>
-            </Form>
-          </Modal>
-        </div>
+              )}
+              hasFeedback
+            >
+              {getFieldDecorator('project', {
+                rules: [{ required: true, message: 'Please input the project!', whitespace: true }],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label={(
+                <span>
+                  Creator&nbsp;
+                  <Tooltip title="You can find your project by your creator name">
+                    <QuestionCircleOutlined />
+                  </Tooltip>
+                </span>
+              )}
+            >
+              {getFieldDecorator('nickname', {
+                rules: [{ required: true, message: 'Please input your creator name!', whitespace: true }],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="Password"
+            >
+              {getFieldDecorator('password', {
+                rules: [{
+                  required: true, message: 'Please input your password!',
+                }, {
+                  validator: this.checkConfirm,
+                }],
+              })(
+                <Input type="password" />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="Confirm Password"
+            >
+              {getFieldDecorator('confirm', {
+                rules: [{
+                  required: true, message: 'Please confirm your password!',
+                }, {
+                  validator: this.checkPassword,
+                }],
+              })(
+                <Input type="password" onBlur={this.handleConfirmBlur} />
+              )}
+            </FormItem>
+          </Form>
+        </Modal>
+      </div>
     );
   }
 }

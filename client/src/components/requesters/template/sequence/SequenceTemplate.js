@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, Drawer, Form, Icon, Input, Row, Tabs } from 'antd';
+import { Button, Drawer, Form, Input, Row, Tabs } from 'antd';
+import { EditOutlined } from '@ant-design/icons'
 import { clientUrl } from '../../../../configs'
 
 
@@ -56,7 +57,7 @@ class SequenceTemplate extends React.Component {
     return (
       <div>
         <Button type="primary" style={{ float: "left", width: "90%" }} onClick={this.showDrawer}>
-          <Icon type="edit" />Amazon Mechanical Turk Template
+          <EditOutlined />Amazon Mechanical Turk Template
           </Button>
         <br></br>
         <br></br>

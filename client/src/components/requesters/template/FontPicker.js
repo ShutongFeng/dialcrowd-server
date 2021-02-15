@@ -1,8 +1,10 @@
 import React from 'react';
-import {Input, InputNumber, Button, Select, Switch, Option, Radio, Tooltip} from 'antd';
-import {AlignLeftOutlined, AlignCenterOutlined, AlignRightOutlined,
-        FontColorsOutlined, FontSizeOutlined, LineHeightOutlined} from '@ant-design/icons';
-import { SketchPicker, ChromePicker } from 'react-color';
+import { Input, InputNumber, Button, Select, Radio, Tooltip } from 'antd';
+import {
+  AlignLeftOutlined, AlignCenterOutlined, AlignRightOutlined,
+  FontColorsOutlined, FontSizeOutlined, LineHeightOutlined
+} from '@ant-design/icons';
+import { SketchPicker } from 'react-color';
 
 class FontPicker extends React.Component {
   /* Args:
@@ -14,21 +16,21 @@ class FontPicker extends React.Component {
      {@String} color
      {@String} previewText
    */
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       visiblePicker: false,
     };
     this.color = this.props.color;
   }
-      
+
   handleClick = () => {
     this.setState(
       { visiblePicker: !this.state.visiblePicker }
     );
   };
 
-  close () {
+  close() {
     // close color picker
     this.setState({
       visiblePicker: false
@@ -36,29 +38,29 @@ class FontPicker extends React.Component {
 
     // update parent state
     if (this.color !== undefined) {
-      this.props.updateByKey(this.props.keys, {color: this.color.hex.toUpperCase()});
+      this.props.updateByKey(this.props.keys, { color: this.color.hex.toUpperCase() });
 
       // update text in the input
       const path = this.props.keys.concat(['color']);
       const colorFieldName = path2Name(path);
       this.props.form.setFieldsValue(
-        {[colorFieldName]: this.color.hex.toUpperCase()}
+        { [colorFieldName]: this.color.hex.toUpperCase() }
       );
     }
   };
 
-  handleColorInputChange (e) {
+  handleColorInputChange(e) {
     /* Update parent state when the input box is changed */
     e.preventDefault();
     const path = this.props.path.concat(['color']);
     const colorFieldName = path2Name(path);
     this.props.form.setFieldsValue(
-      {[colorFieldName]: this.color.hex.toUpperCase()}
+      { [colorFieldName]: this.color.hex.toUpperCase() }
     );
   }
-  
+
   render() {
-    const {getFieldDecorator} = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     const stylePreviewText = {
       color: this.props.color,
       "fontFamily": this.props.fontFamily,
@@ -83,7 +85,7 @@ class FontPicker extends React.Component {
         {/* color */}
         <Tooltip title="Text color.">
           <FontColorsOutlined
-            style={{marginLeft: "0.5em", marginRight: "0.5em", color: this.props.color }}/>
+            style={{ marginLeft: "0.5em", marginRight: "0.5em", color: this.props.color }} />
         </Tooltip>
         {getFieldDecorator(prefix + "['color']", {
           initialValue: this.props.color || "#000000",
@@ -96,15 +98,17 @@ class FontPicker extends React.Component {
           onChange: (e) => this.handleColorInputChange(e)
         })(
           <Input placeholder="#000000"
-                 style={{width: "1em", height: "1em",
-                         color: 'transparent', background: this.props.color}}
-                 onClick={this.handleClick}
+            style={{
+              width: "1em", height: "1em",
+              color: 'transparent', background: this.props.color
+            }}
+            onClick={this.handleClick}
           />
         )}
 
         {/* font-size */}
         <Tooltip title="Font size.">
-          <FontSizeOutlined style={{marginLeft: "1em", marginRight: "0.5em"}}/>
+          <FontSizeOutlined style={{ marginLeft: "1em", marginRight: "0.5em" }} />
         </Tooltip>
         {getFieldDecorator(prefix + "['fontSize']", {
           initialValue: `${this.props['fontSize'] || 12}`,
@@ -115,15 +119,15 @@ class FontPicker extends React.Component {
             message: "Please specify the size.",
           }],
           onChange: (n) => this.props.updateByKey(
-            this.props.keys, {"fontSize": n}
+            this.props.keys, { "fontSize": n }
           )
         })(
-          <InputNumber style={{width: "4em"}} />
+          <InputNumber style={{ width: "4em" }} />
         )}
 
         {/* line height */}
         <Tooltip title="Line height.">
-          <LineHeightOutlined style={{marginLeft: "1em", marginRight: "0.5em"}}/>
+          <LineHeightOutlined style={{ marginLeft: "1em", marginRight: "0.5em" }} />
         </Tooltip>
         {getFieldDecorator(prefix + "['lineHeight']", {
           initialValue: `${this.props['lineHeight'] || 1.5}`,
@@ -134,11 +138,11 @@ class FontPicker extends React.Component {
             message: "Please specify the line hight.",
           }],
         })(
-          <InputNumber step={0.25} style={{width: "4em"}} />
+          <InputNumber step={0.25} style={{ width: "4em" }} />
         )}
 
         {/* font-family */}
-        <span style={{marginRight: "0.5em"}}></span>
+        <span style={{ marginRight: "0.5em" }}></span>
         {getFieldDecorator(prefix + "['fontFamily']", {
           initialValue: this.props.fontFamily || 'Helvetica',
           validateTrigger: ['onChange', 'onBlur'],
@@ -148,25 +152,25 @@ class FontPicker extends React.Component {
             message: "Please specify the font.",
           }],
           onChange: (value) => this.props.updateByKey(
-            this.props.keys, {'fontFamily': value}
+            this.props.keys, { 'fontFamily': value }
           )
         })(
           <Select defaultValue={this.state.family}
-                  style={{width: "15%", "fontFamily": this.props.fontFamily}}>
+            style={{ width: "15%", "fontFamily": this.props.fontFamily }}>
             {fontList.map(
               (font, i) => (
                 <Select.Option
                   value={font} key={i}
-                  style={{"font-family": font}}>
+                  style={{ "font-family": font }}>
                   {font}
                 </Select.Option>
               )
             )}
           </Select>
         )}
-        
+
         {/* align */}
-        <span style={{marginRight: "0.5em"}}></span>
+        <span style={{ marginRight: "0.5em" }}></span>
         {getFieldDecorator(prefix + "['text-align']", {
           initialValue: this.props['textAlign'] || 'left',
           /* onChange: (value) => this.props.updateByKey(
@@ -174,13 +178,13 @@ class FontPicker extends React.Component {
            * ) */
         })(
           <Radio.Group>
-            <Radio.Button value="left" style={{paddingLeft: '0.5em', paddingRight: '0.5em'}}>
+            <Radio.Button value="left" style={{ paddingLeft: '0.5em', paddingRight: '0.5em' }}>
               <AlignLeftOutlined />
             </Radio.Button>
-            <Radio.Button value="center" style={{paddingLeft: '0.5em', paddingRight: '0.5em'}}>
+            <Radio.Button value="center" style={{ paddingLeft: '0.5em', paddingRight: '0.5em' }}>
               <AlignCenterOutlined />
             </Radio.Button>
-            <Radio.Button value="right" style={{paddingLeft: '0.5em', paddingRight: '0.5em'}}>
+            <Radio.Button value="right" style={{ paddingLeft: '0.5em', paddingRight: '0.5em' }}>
               <AlignRightOutlined />
             </Radio.Button>
           </Radio.Group>
@@ -190,11 +194,11 @@ class FontPicker extends React.Component {
     </>);
   }
 
-  handleColorPickerChange (color, event) {
+  handleColorPickerChange(color, event) {
     this.color = color;
   }
-  
-  showPicker () {
+
+  showPicker() {
     const popover = {
       position: 'absolute',
       zIndex: '2',
@@ -205,7 +209,7 @@ class FontPicker extends React.Component {
       bottom: 0,
       position: 'absolute'
     };
-    
+
     const cover = {
       position: 'fixed',
       top: '0px',
@@ -216,14 +220,14 @@ class FontPicker extends React.Component {
 
     if (this.state.visiblePicker) {
       return (<>
-        <div style={ popover }>
-          <div style={ inner }>
+        <div style={popover}>
+          <div style={inner}>
             <SketchPicker
               color={this.state.color}
               onChangeComplete={(color) => this.handleColorPickerChange(color)}
             />
             <Button onClick={() => this.close()}
-                    style={{width: "100%"}}>Done
+              style={{ width: "100%" }}>Done
             </Button>
           </div>
         </div>
@@ -235,7 +239,7 @@ class FontPicker extends React.Component {
 }
 
 
-function path2Name (path) {
+function path2Name(path) {
   /* Convert a path to name of a form item. 
      Args:
      {@Array} path

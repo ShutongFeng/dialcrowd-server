@@ -1,18 +1,15 @@
-import React, {Component} from 'react'
-import {Button, Form, Icon, Input, Switch, Table, Tooltip} from 'antd';
-import {connect} from "react-redux";
+import React from 'react'
+import { Button, Form, Table, Tooltip } from 'antd';
+import { connect } from "react-redux";
+import { QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import FileReaderInput from 'react-file-reader-input'
-import {saveAs} from 'file-saver'
-import SequenceLabel from "./SequenceLabel";
-import {clientUrl, serverUrl} from "../../../../configs";
-import {message} from "antd/lib/index";
-import {loadData} from "../../../../actions/sessionActions";
-import {getResult, new_project_data} from "../../../../actions/crowdAction";
-import SequenceFeedbackLabel from "./SequenceFeedbackLabel";
+import { clientUrl, serverUrl } from "../../../../configs";
+import { message } from "antd/lib/index";
+import { loadData } from "../../../../actions/sessionActions";
+import { getResult, new_project_data } from "../../../../actions/crowdAction";
 import SequenceTemplate from "./SequenceTemplate";
 import Configure from "../Configure.js";
-import QuestionList, {addKeys, lists2Questions} from "../QuestionList.js";
-import {PreviewEntity,} from "../Preview.js"
+import QuestionList, { addKeys, lists2Questions } from "../QuestionList.js";
 
 
 const FormItem = Form.Item;
@@ -21,14 +18,14 @@ let feedback_index = 0;
 
 function getresults(t) {
   fetch(serverUrl + '/api/get/result/sequence/' + t.props.session._id)
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (json) {
-        t.setState({
-          results: json.response,
-        });
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (json) {
+      t.setState({
+        results: json.response,
       });
+    });
 }
 
 
@@ -67,7 +64,7 @@ class SequenceConfigure extends Configure {
       if (data1.length > 0) {
         message.success(data1.length + ' sentences are loaded!');
       }
-      this.setState({sequence_data: data1});
+      this.setState({ sequence_data: data1 });
     } else {
       const [e, file] = results[0];
       let lines = e.target.result.split("\n");
@@ -83,8 +80,10 @@ class SequenceConfigure extends Configure {
           if (seg === '') continue;
           const entityType = seg.split(':')[0];
           const [start, end] = seg.split(':')[1].split(',');
-          entities.push({start: parseInt(start), end: parseInt(end),
-                         entity: entityType})
+          entities.push({
+            start: parseInt(start), end: parseInt(end),
+            entity: entityType
+          })
         }
         data.push({
           sentid: i,
@@ -92,7 +91,7 @@ class SequenceConfigure extends Configure {
           answer: entities
         });
       }
-      this.setState({dataGolden: data});      
+      this.setState({ dataGolden: data });
     }
   }
 
@@ -106,7 +105,7 @@ class SequenceConfigure extends Configure {
       numoflabel: 3,
       results: [],
       questionEntities: []
-    }    
+    }
     this.saveURL = '/api/save/task/sequence/';
     this.taskName = 'sequence';
   }
@@ -122,19 +121,19 @@ class SequenceConfigure extends Configure {
         this.props.session.Example,
         this.props.session.Counterexample
       );
-      this.setState({"questionEntities": questions});
+      this.setState({ "questionEntities": questions });
     } else {
       this.setState(
-        {"questionEntities": addKeys(this.props.session.questionEntities)}
+        { "questionEntities": addKeys(this.props.session.questionEntities) }
       );
     }
     this.setState({
       sequence_data: this.props.session.sequence_data,
       dataGolden: this.props.session.dataGolden
     });
-    super.makeProps();    
+    super.makeProps();
   }
-  
+
   render() {
     const textStyleExtras = [
       {
@@ -146,12 +145,12 @@ class SequenceConfigure extends Configure {
         name: 'Answer',
         fieldName: 'answer',
         explain: "Set the text style in workers' answer field."
-      },      
+      },
     ];
 
     return (<div>
-      <h2 style={{"padding-left": "1%"}} >Template for an Entity Labeling Task </h2>
-      <p style={{"padding-left": "1%"}} >
+      <h2 style={{ "padding-left": "1%" }} >Template for an Entity Labeling Task </h2>
+      <p style={{ "padding-left": "1%" }} >
         This template is used for the creation of tasks that require the workers to
         annotate the entities present in an utterance.
         {/* You can have give the worker one or more conversations, and ask questions about
@@ -172,8 +171,8 @@ class SequenceConfigure extends Configure {
   }
 
   _showEntityConfig() {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     const instruction = (
       "In this section, you can set up the types of entities the worker can choose from. "
       + "Remember to include examples and counterexamples. They help the worker get a "
@@ -205,9 +204,9 @@ class SequenceConfigure extends Configure {
     </>);
   }
 
-  _showDataUpload (golden = false) {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+  _showDataUpload(golden = false) {
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     let columns = [
       {
         title: 'ID',
@@ -245,7 +244,7 @@ class SequenceConfigure extends Configure {
         <span>
           {golden ? 'Upload your golden data' : 'Upload your data'} &nbsp;
           <Tooltip title={explain}>
-            <Icon type="question-circle-o"/>
+            <QuestionCircleOutlined />
           </Tooltip>
         </span>
       )} >
@@ -253,41 +252,41 @@ class SequenceConfigure extends Configure {
           as='text'
           onChange={(e, results) => this.handleFileInputChange(e, results, targetStateProperty)}
         >
-          <Button style={{width: '90%'}}>
-            <Icon type='upload'/> Click to Upload
+          <Button style={{ width: '90%' }}>
+            <UploadOutlined /> Click to Upload
           </Button>
         </FileReaderInput>
       </FormItem>
-      
+
       {(this.state[targetStateProperty] || []).length > 0 ? <div title={"Your Data"} height={500}>
         <Table rowKey="sentence" dataSource={this.state[targetStateProperty]} columns={columns}
-               pagination={{hideOnSinglePage: true}} size="small"/>
+          pagination={{ hideOnSinglePage: true }} size="small" />
       </div> : null}
     </>);
   }
 
-  _showButtons () {
-    const {getFieldDecorator} = this.props.form;
-    const {formItemLayout, formItemLayoutWithOutLabel} = this;
+  _showButtons() {
+    const { getFieldDecorator } = this.props.form;
+    const { formItemLayout, formItemLayoutWithOutLabel } = this;
     return (<>
-      <div style={{"text-align": "center", "padding-left": "60px"}}>
+      <div style={{ "text-align": "center", "padding-left": "60px" }}>
         <span>Please save before you preview</span>
       </div>
       <FormItem {...formItemLayoutWithOutLabel}>
-        <Button type="primary" style={{width: '90%'}} htmlType="submit">Save</Button>
+        <Button type="primary" style={{ width: '90%' }} htmlType="submit">Save</Button>
         <Button onClick={() => window.open(clientUrl + "/worker_sequence?MID=unknown&ID=" + this.props.session._id)}
-                type="primary" style={{width: '90%'}}>Preview</Button>
+          type="primary" style={{ width: '90%' }}>Preview</Button>
 
-        <br/>
+        <br />
         {/* {this._showVisibility()} */}
-        <Button type="primary" style={{width: '90%'}}
-                onClick={() => this._saveAsJSON()}
+        <Button type="primary" style={{ width: '90%' }}
+          onClick={() => this._saveAsJSON()}
         >
           Save Configuration as JSON
         </Button>
 
-        <div style={{"padding-top": "5px"}}>
-          <SequenceTemplate thisstate={this.props.session}/>
+        <div style={{ "padding-top": "5px" }}>
+          <SequenceTemplate thisstate={this.props.session} />
         </div>
       </FormItem>
     </>);
@@ -297,13 +296,13 @@ class SequenceConfigure extends Configure {
 
 class IntentQuestionList extends QuestionList {
   static questionTypes = [];
-  render () {
+  render() {
     return (<>
       {super.render()}
       {/* <Form.Item {...this.formItemLayoutWithOutLabel}>
           <PreviewEntity questions={this.props.questions} />
           </Form.Item> */}
-    </>);  
+    </>);
   }
 }
 
