@@ -53,8 +53,7 @@ class Sider extends React.Component {
           this.navItems1.map(({ to, title, icon }) =>
             <Menu.Item
               key={to}
-              icon={icon}
-              style={{ fontSize: 20 }}>
+              style={{ fontSize: 16 }}>
               <Link
                 to={to}
                 style={{
@@ -63,7 +62,7 @@ class Sider extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <span>{title}</span>
+                <span> {icon} {title}</span>
               </Link>
             </Menu.Item>
           )
@@ -74,8 +73,7 @@ class Sider extends React.Component {
             this.navItems2.map(({ to, title, icon }) =>
               <Menu.Item
                 key={to}
-                icon={icon}
-                style={{ fontSize: 20 }}>
+                style={{ fontSize: 16 }}>
                 <Link
                   to={to}
                   style={{
@@ -84,7 +82,7 @@ class Sider extends React.Component {
                     alignItems: 'center',
                   }}
                 >
-                  <span>{title}</span>
+                  <span>{icon} {title}</span>
                 </Link>
               </Menu.Item>
             )
@@ -94,8 +92,7 @@ class Sider extends React.Component {
           this.navItems3.map(({ to, title, icon }) =>
             <Menu.Item
               key={to}
-              icon={icon}
-              style={{ fontSize: 20 }}>
+              style={{ fontSize: 16 }}>
 
               <Link
                 to={to}
@@ -105,7 +102,7 @@ class Sider extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <span>{title}</span>
+                <span>{icon} {title}</span>
               </Link>
             </Menu.Item>
           )
