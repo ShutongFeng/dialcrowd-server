@@ -216,6 +216,55 @@ function setCookie(cname, cvalue, exdays) {
 }
 
 
+
+
+// TODO: Working on here Songbo
+
+function submitFORM(path, method) {
+  method = method || "post";
+
+  var form = document.createElement("form");
+  form.setAttribute("method", method);
+  form.setAttribute("action", path);
+
+  //Move the submit function to another variable
+  //so that it doesn't get overwritten.
+  form._submit_function_ = form.submit;
+
+  document.body.appendChild(form);
+  form._submit_function_();
+}
+
+
+
+function submitToMturk(t,hasProblem) {
+  let search = window.location.search;
+  let params = new URLSearchParams(search);
+  let foo = params.get('assignmentId');
+  console.log(foo);
+  let isProduction = params.get('mturkProduction');
+  console.log(isProduction);
+
+  let submitURL =params.get('turkSubmitTo');
+  console.log(submitURL);
+
+  //?assignmentId=34J10VATJGBKANG4MDCHRA6ME53QIH&foo=bar
+  // let submissionPath = 'https://workersandbox.mturk.com/mturk/externalSubmit';
+  // if(isProduction === "true"){
+  //   console.log("productionMode");
+  //   submissionPath = "https://www.mturk.com/mturk/externalSubmit";
+  // }
+  //
+  let submissionPath =   submitURL + "/mturk/externalSubmit";
+
+  if(foo != null && foo !== "ASSIGNMENT_ID_NOT_AVAILABLE") {
+    submitFORM(submissionPath + "?assignmentId=" + foo + "&survey_code=" + t.state.userID + "&hasproblem=" + hasProblem, 'POST');
+  }
+
+}
+
+
+
 function SubmitFromUser(t, v, time) {
   fetch(serverUrl + '/api/save/worker/interactive/' + t.state.userID, {
     method: 'POST',
@@ -261,8 +310,10 @@ function SubmitFromUser(t, v, time) {
               title: 'Thank you for submission',
               content: 'Your survey code: ' + t.state.userID,
               onOk() {
+                submitToMturk(t, true);
               },
               onCancel() {
+                submitToMturk(t, true);
               },
             });
           } else {
@@ -282,7 +333,7 @@ function SubmitFromUser(t, v, time) {
                   title: 'Sorry, there are issues with your submission',
                   content: "Your assignment is unlikely to be accepted, would you like to continue?",
                   onOk() {
-                    // submitToMturk(t, true);
+                    submitToMturk(t, true);
                   },
                   onCancel() {
                     window.location.reload();
