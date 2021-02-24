@@ -161,7 +161,7 @@ class InteractiveTemplate extends React.Component {
                       <p style={{ "margin-left": "20px" }}>&lt;script&gt;</p>
                       <p style={{ "margin-left": "40px" }}>document.getElementById('submit').onclick = function(event) {"{"}</p>
                       <p style={{ "margin-left": "60px" }}>event.preventDefault();</p>
-                      <p style={{ "margin-left": "60px" }}>document.getElementById("dialcrowd_link").textContent = "Please go to {clientUrl}/worker_interactive/?ID=5f0b6fe49878971ce8ab83c9&MID=" + document.getElementById("workerid").value + " in a separate window to complete the HIT"</p>
+                      <p style={{ "margin-left": "60px" }}>document.getElementById("dialcrowd_link").textContent = "Please go to {clientUrl}/worker_interactive/?ID={this.props.thisstate._id}&MID=" + document.getElementById("workerid").value + " in a separate window to complete the HIT"</p>
                       <p style={{ "margin-left": "40px" }}>{"}"}</p>
                       <p style={{ "margin-left": "20px" }}>&lt;/script&gt;</p>
 
