@@ -1246,8 +1246,11 @@ router.post('/router/chat/usr_input', function (req, res, next) {
   //   payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
   // }
   else if (!(cli_manager.get_active(session_id))) {
-    res.send({ "action": 'status', "msg": "Please type or say START to begin." });
-    return;
+    // res.send({ "action": 'status', "msg": "Please type or say START to begin." });
+    // return;
+    cli_manager.activate_talk(session_id);
+    url = server_url.replace("%s", "init");
+    payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
   }
   else {
     url = server_url.replace("%s", "next");
