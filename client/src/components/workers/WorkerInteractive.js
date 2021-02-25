@@ -237,7 +237,7 @@ function submitFORM(path, method) {
 
 
 
-function submitToMturk(t,hasProblem) {
+function submitToMturk(t, hasProblem) {
   let search = window.location.search;
   let params = new URLSearchParams(search);
   let foo = params.get('assignmentId');
@@ -245,7 +245,7 @@ function submitToMturk(t,hasProblem) {
   let isProduction = params.get('mturkProduction');
   console.log(isProduction);
 
-  let submitURL =params.get('turkSubmitTo');
+  let submitURL = params.get('turkSubmitTo');
   console.log(submitURL);
 
   //?assignmentId=34J10VATJGBKANG4MDCHRA6ME53QIH&foo=bar
@@ -255,9 +255,9 @@ function submitToMturk(t,hasProblem) {
   //   submissionPath = "https://www.mturk.com/mturk/externalSubmit";
   // }
   //
-  let submissionPath =   submitURL + "/mturk/externalSubmit";
+  let submissionPath = submitURL + "/mturk/externalSubmit";
 
-  if(foo != null && foo !== "ASSIGNMENT_ID_NOT_AVAILABLE") {
+  if (foo != null && foo !== "ASSIGNMENT_ID_NOT_AVAILABLE") {
     submitFORM(submissionPath + "?assignmentId=" + foo + "&survey_code=" + t.state.userID + "&hasproblem=" + hasProblem, 'POST');
   }
 
@@ -308,7 +308,7 @@ function SubmitFromUser(t, v, time) {
           if (submissionProblem.length === 0) {
             confirm({
               title: 'Thank you for submission',
-              content: 'Your survey code: ' + t.state.userID,
+              content: "Now you can submit to Mturk.",
               onOk() {
                 submitToMturk(t, true);
               },
