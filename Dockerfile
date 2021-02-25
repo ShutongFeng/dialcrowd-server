@@ -2,11 +2,12 @@ FROM node:carbon
 
 WORKDIR /usr/src/app
 
-ADD . .
+COPY . .
 
 WORKDIR /usr/src/app
 
-RUN npm install 
+RUN npm install --unsafe-perm
+
+EXPOSE 3040
 
 CMD [ "npm", "start" ]
-
