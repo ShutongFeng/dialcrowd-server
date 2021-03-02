@@ -2,6 +2,11 @@
   "name": "DialCrowd",
   "version": "1.0.0",
   "description": "DialCrowd",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kyusonglee/dialcrowd.git"
+  },
+  "license": "ISC",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
