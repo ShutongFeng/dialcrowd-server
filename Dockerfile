@@ -7,7 +7,7 @@ ADD . .
 WORKDIR /usr/src/app
 
 ENV GENERATE_SOURCEMAP false
-RUN npm install --unsafe-perm
+RUN npm install --no-save
 
 EXPOSE 3040
 
