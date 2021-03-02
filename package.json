@@ -4,7 +4,7 @@
   "description": "Backend server for dialcrowd",
   "scripts": {
     "start": "node server/server.js",
-    "postinstall": "cd client && npm install && npm run build"
+    "postinstall": "cd client && npm install --no-save && npm run build"
   },
   "repository": {
     "type": "git",
