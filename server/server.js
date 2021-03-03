@@ -24,7 +24,7 @@ app.get('*', function (req, res) {
 
 // cors setting TODO set to https://dialeval.cs.hhu.de?
 app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://dialeval.cs.hhu.de/')
+  res.setHeader('Access-Control-Allow-Origin', 'https://dialeval-dev.herokuapp.com')
 });
 
 server.listen(process.env.PORT || PORT, function () {
