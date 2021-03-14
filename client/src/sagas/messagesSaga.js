@@ -32,10 +32,12 @@ function* receiveMessageSaga(synth, sessionData, messageData) {
   console.log(messageData.display === "");
 
   let display_messages = (messageData.display === "") ? messageData.msg : messageData.display;
-
+  
   console.log(display_messages)
   if (display_messages === undefined) {
-    return;    
+    // TODO need to solve!!!
+    display_messages = "Please type or say START to begin.";
+    // return;    
   }
   yield put(addMessage(display_messages, Date.now(), true));
   const utterance = new SpeechSynthesisUtterance(message.replace("<p>", "..."));

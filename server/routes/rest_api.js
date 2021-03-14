@@ -1144,7 +1144,8 @@ const client_manager = {
   },
   get_active: function (session_id) {
     if (Object.keys(this._clients_to_id).includes(session_id)) {
-      return this._clients_to_id[session_id].is_active;
+      is_active = this._clients_to_id[session_id].is_active
+      return is_active;
     }
     else {
       return null;
@@ -1179,9 +1180,9 @@ const client_meta = {
     if (value) {
       this._is_active = value;
     }
-    else {
-      return this._is_active
-    }
+    
+    return this._is_active
+    
   }
 };
 
