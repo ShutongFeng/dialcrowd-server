@@ -34,6 +34,9 @@ function* receiveMessageSaga(synth, sessionData, messageData) {
   let display_messages = (messageData.display === "") ? messageData.msg : messageData.display;
 
   console.log(display_messages)
+  if (display_messages === undefined) {
+    return;    
+  }
   yield put(addMessage(display_messages, Date.now(), true));
   const utterance = new SpeechSynthesisUtterance(message.replace("<p>", "..."));
   yield fork(logMessage, sessionData, message, "Bot")
