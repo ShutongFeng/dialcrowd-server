@@ -925,7 +925,7 @@ function _renderTasks(taskList) {
               headStyle={{ size: 20, "text-align": "center" }}
               bodyStyle={{ size: 10, "text-align": "center" }}
             >
-              {_renderCardName("Condition", item.Cons)}}
+              {_renderCardName("Condition", item.Cons)}
               {_renderCardItems(item.Cons)}
               <p></p>
               {_renderCardName("Please Book", item.Book)}
