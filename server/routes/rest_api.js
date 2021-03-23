@@ -180,30 +180,31 @@ router.post('/:task_type/:createdAt', function (req, res, next) {
 });
 
 // Gets the results of task from the specific worker with :task_id
-router.get('/result/:task_type/:task_id', function (req, res, next) {
-  const task_type = req.params.task_type;
-  const task_id = req.params.task_id;
-  let collection;
-  if (task_type === "interactive") {
-    return taskModelInteractive.resGetResult(res, task_id);
-  }
-  else if (task_type === "category") {
-    return taskModelCategory.resGetResult(res, task_id);
-  }
-  else if (task_type === "sequence") {
-    return taskModelSequence.resGetResult(res, task_id);
-  }
-  else {
-    return taskModelQuality.resGetResult(res, task_id);
-  }
-  collection.findOne({ 'task_id': task_id }, function (err, task) {
-    if (err) {
-      res.send(err)
-    } else {
-      res.json(task);
-    }
-  })
-});
+// TODO: Hard remove this risky request.
+// router.get('/result/:task_type/:task_id', function (req, res, next) {
+//   const task_type = req.params.task_type;
+//   const task_id = req.params.task_id;
+//   let collection;
+//   if (task_type === "interactive") {
+//     return taskModelInteractive.resGetResult(res, task_id);
+//   }
+//   else if (task_type === "category") {
+//     return taskModelCategory.resGetResult(res, task_id);
+//   }
+//   else if (task_type === "sequence") {
+//     return taskModelSequence.resGetResult(res, task_id);
+//   }
+//   else {
+//     return taskModelQuality.resGetResult(res, task_id);
+//   }
+//   collection.findOne({ 'task_id': task_id }, function (err, task) {
+//     if (err) {
+//       res.send(err)
+//     } else {
+//       res.json(task);
+//     }
+//   })
+// });
 
 // Returns all the systems in the systems database
 router.get('/get/systems', function (req, res, next) {
@@ -693,303 +694,303 @@ router.post('/save/task/:task_type/:task_id', function (req, res, next) {
 });
 
 // Gets the detailed results from the detail_category table with the worker statistics and information of that task
-router.get('/get/detail_result/:task_type/:task_id', function (req, res, next) {
-  const task_type = req.params.task_type;
-  const task_id = req.params.task_id;
-  let getMean = function (data) {
-    return data.reduce(function (a, b) {
-      return Number(a) + Number(b);
-    }) / data.length;
-  };
-  let getSD = function (data) {
-    let m = getMean(data);
-    return Math.sqrt(data.reduce(function (sq, n) {
-      return sq + Math.pow(n - m, 2);
-    }, 0) / (data.length));
-  };
-
-  let collection;
-
-  if (task_type === "category") {
-    collection = category_detail_result_collection;
-  }
-
-  collection.find({ "taskId": task_id }, function (err, results) {
-    let Dic = {};
-    let Output = [];
-
-    let all_totals = []
-
-    results.forEach(x => {
-      let userId = x["userId"].toString();
-      if (!Object.keys(Dic).includes(userId)) {
-        Dic[userId] = {};
-        Dic[userId]["duration"] = [];
-        Dic[userId]["label"] = [];
-        Dic[userId]["total"] = []
-      }
-      x["duration"] = x["duration"] / 1000;
-      x["timestamp"] = new Date(parseFloat(x["timestamp"]));
-      Dic[userId]["total"].push(x);
-      Dic[userId]["duration"].push(x["duration"]);
-      Dic[userId]["label"].push(x["label"]);
-    });
-    let avg = 0;
-    let allsame = "no";
-    let outlier = "no";
-    let mean;
-    let stdev;
-
-    Object.keys(Dic).forEach(userId => {
-      let x = Dic[userId]["duration"];
-      let sum_x = x.reduce((a, b) => a + b, 0);
-      all_totals.push(sum_x);
-    });
-
-    try {
-      mean = getMean(all_totals);
-      stdev = getSD(all_totals);
-    }
-    catch (err) {
-      // console.log("empty");
-    }
-
-
-    let std = 0;
-    Object.keys(Dic).forEach(userId => {
-      let x = Dic[userId]["duration"];
-      let sum_x = x.reduce((a, b) => a + b, 0);
-      if (sum_x === 0) {
-        avg = 0;
-      }
-      else {
-        avg = Math.round(getMean(x) * 100) / 100;
-        std = Math.round(getSD(x) * 100) / 100;
-        let y = Dic[userId]["label"];
-        // abnormal if we chose the same thing for everything
-        if ([... new Set(y)].length < 2) {
-          allsame = "yes"
-        }
-        else {
-          allsame = "no"
-        }
-      }
-      // check for outliers, 2.5% tails of the data of avg time (2 std away from mean)
-      // calculated from total time
-      if (sum_x < (mean - 2 * stdev) || sum_x > (mean + 2 * stdev)) {
-        outlier = "yes"
-      }
-      else {
-        outlier = "no"
-      }
-      Output.push({
-        "userId": userId,
-        "total_duration": Math.round(sum_x * 100) / 100,
-        "average_duration": avg,
-        "std_duration": std,
-        "allsame": allsame,
-        "detail": Dic[userId]["total"],
-        "num": Dic[userId]["total"].length,
-        "outlier": outlier
-      })
-    });
-    res.json({ "response": Output });
-  })
-});
+// router.get('/get/detail_result/:task_type/:task_id', function (req, res, next) {
+//   const task_type = req.params.task_type;
+//   const task_id = req.params.task_id;
+//   let getMean = function (data) {
+//     return data.reduce(function (a, b) {
+//       return Number(a) + Number(b);
+//     }) / data.length;
+//   };
+//   let getSD = function (data) {
+//     let m = getMean(data);
+//     return Math.sqrt(data.reduce(function (sq, n) {
+//       return sq + Math.pow(n - m, 2);
+//     }, 0) / (data.length));
+//   };
+//
+//   let collection;
+//
+//   if (task_type === "category") {
+//     collection = category_detail_result_collection;
+//   }
+//
+//   collection.find({ "taskId": task_id }, function (err, results) {
+//     let Dic = {};
+//     let Output = [];
+//
+//     let all_totals = []
+//
+//     results.forEach(x => {
+//       let userId = x["userId"].toString();
+//       if (!Object.keys(Dic).includes(userId)) {
+//         Dic[userId] = {};
+//         Dic[userId]["duration"] = [];
+//         Dic[userId]["label"] = [];
+//         Dic[userId]["total"] = []
+//       }
+//       x["duration"] = x["duration"] / 1000;
+//       x["timestamp"] = new Date(parseFloat(x["timestamp"]));
+//       Dic[userId]["total"].push(x);
+//       Dic[userId]["duration"].push(x["duration"]);
+//       Dic[userId]["label"].push(x["label"]);
+//     });
+//     let avg = 0;
+//     let allsame = "no";
+//     let outlier = "no";
+//     let mean;
+//     let stdev;
+//
+//     Object.keys(Dic).forEach(userId => {
+//       let x = Dic[userId]["duration"];
+//       let sum_x = x.reduce((a, b) => a + b, 0);
+//       all_totals.push(sum_x);
+//     });
+//
+//     try {
+//       mean = getMean(all_totals);
+//       stdev = getSD(all_totals);
+//     }
+//     catch (err) {
+//       // console.log("empty");
+//     }
+//
+//
+//     let std = 0;
+//     Object.keys(Dic).forEach(userId => {
+//       let x = Dic[userId]["duration"];
+//       let sum_x = x.reduce((a, b) => a + b, 0);
+//       if (sum_x === 0) {
+//         avg = 0;
+//       }
+//       else {
+//         avg = Math.round(getMean(x) * 100) / 100;
+//         std = Math.round(getSD(x) * 100) / 100;
+//         let y = Dic[userId]["label"];
+//         // abnormal if we chose the same thing for everything
+//         if ([... new Set(y)].length < 2) {
+//           allsame = "yes"
+//         }
+//         else {
+//           allsame = "no"
+//         }
+//       }
+//       // check for outliers, 2.5% tails of the data of avg time (2 std away from mean)
+//       // calculated from total time
+//       if (sum_x < (mean - 2 * stdev) || sum_x > (mean + 2 * stdev)) {
+//         outlier = "yes"
+//       }
+//       else {
+//         outlier = "no"
+//       }
+//       Output.push({
+//         "userId": userId,
+//         "total_duration": Math.round(sum_x * 100) / 100,
+//         "average_duration": avg,
+//         "std_duration": std,
+//         "allsame": allsame,
+//         "detail": Dic[userId]["total"],
+//         "num": Dic[userId]["total"].length,
+//         "outlier": outlier
+//       })
+//     });
+//     res.json({ "response": Output });
+//   })
+// });
 
 // Returns the results of the HIT from the unique :task_id
-router.get('/get/result/:task_type/:task_id', function (req, res, next) {
-  const task_type = req.params.task_type;
-  const task_id = req.params.task_id;
-  let collection;
-  if (task_type === "interactive") {
-    collection = interactive_resultcollection;
-    collection.find({ 'subId': task_id }, function (err, task) {
-      if (err) {
-        return res.send(err)
-      }
-      else {
-        // console.log(task);
-        interactive_resultsurvey.find({ subId: task_id }, function (err, survey) {
-          console.log("task", task);
-          console.log("survey", survey);
-          //survey.forEach(x=>{console.log(x)});
-          return res.json({ "dialog": task, "survey": survey, "status": 200 });
-        })
-      }
-    })
-  }
-  else if (task_type === "category") {
-    collection = category_resultcollection;
-    collection.find({ 'projID': task_id }, function (err, task) {
-      if (err) {
-        return res.send(err)
-      }
-      else {
-        let List = [];
-        let result_for_kappa = {};
-        let category = [];
-        task.forEach((x, _) => {
-          let tem = {};
-          tem["sentence"] = x["sentence"];
-          tem["sentid"] = x["sentid"];
-          tem["result"] = [];
-          let Dic = {};
-          let conf = 2;
-
-          x["category"].forEach(function (cate, i) {
-            if (!category.includes(cate)) {
-              category.push(cate);
-            }
-            if (x["meta"][i]) {
-              let annotator_id = x["meta"][i]["submissionID"].toString();
-
-              if (!Object.keys(result_for_kappa).includes(annotator_id)) {
-                result_for_kappa[annotator_id] = {};
-              }
-
-              result_for_kappa[annotator_id][x["sentid"]] = cate;
-              if (!Dic.hasOwnProperty(x["meta"][i]["submissionID"])) {
-                Dic[x["meta"][i]["submissionID"]] = 0;
-                if (x["meta"][i].hasOwnProperty("confidence")) {
-                  conf = x["meta"][i]["confidence"];
-                }
-                else {
-                  conf = 2;
-                }
-                tem["result"].push({
-                  "category": cate,
-                  "annotator": x["meta"][i]["annotator"],
-                  "submissionID": x["meta"][i]["submissionID"],
-                  "confidence": conf,
-                  "feedback": x["meta"][i]["feedback"],
-                  "feedback_questions": x["meta"][i]["feedback_questions"]
-                });
-                tem["num"] = Object.keys(Dic).length;
-                List.push(tem);
-              }
-            }
-          }
-          );
-        }
-        );
-        if (Object.keys(result_for_kappa).length < 2) {
-          return res.json({ "status": 200, "flag": true, "response": List, "kappa": {} });
-        }
-        else {
-          let kappa = {};
-          Object.keys(result_for_kappa).forEach(annotator1 => {
-            kappa[annotator1] = {}
-            Object.keys(result_for_kappa).forEach(annotator2 => {
-              if (annotator1 === annotator2) {
-                kappa[annotator1][annotator2] = null;
-              }
-              else {
-                let numeric1 = Cohen.nominalConversion(category, result_for_kappa[annotator1]);
-                let numeric2 = Cohen.nominalConversion(category, result_for_kappa[annotator2]);
-                kappa[annotator1][annotator2] = Cohen.kappa(numeric1, numeric2, category.length, 'none');
-              }
-
-            })
-          })
-          return res.json({ "status": 200, "flag": true, "response": List, "kappa": kappa });
-        }
-      }
-    });
-  }
-  else if (task_type === "sequence") {
-    collection = sequence_resultcollection;
-    collection.find({ 'projID': task_id }, function (err, task) {
-      if (err) {
-        return res.send(err)
-      }
-      else {
-        return res.json({ "response": task, "status": 200 });
-      }
-    })
-  }
-  else {
-    collection = quality_resultcollection;
-    collection.find({ 'projID': task_id }, function (err, task) {
-      if (err) {
-        return res.send(err)
-      }
-      else {
-        return res.json({ "response": task, "status": 200 });
-      }
-    })
-  }
-});
+// router.get('/get/result/:task_type/:task_id', function (req, res, next) {
+//   const task_type = req.params.task_type;
+//   const task_id = req.params.task_id;
+//   let collection;
+//   if (task_type === "interactive") {
+//     collection = interactive_resultcollection;
+//     collection.find({ 'subId': task_id }, function (err, task) {
+//       if (err) {
+//         return res.send(err)
+//       }
+//       else {
+//         // console.log(task);
+//         interactive_resultsurvey.find({ subId: task_id }, function (err, survey) {
+//           console.log("task", task);
+//           console.log("survey", survey);
+//           //survey.forEach(x=>{console.log(x)});
+//           return res.json({ "dialog": task, "survey": survey, "status": 200 });
+//         })
+//       }
+//     })
+//   }
+//   else if (task_type === "category") {
+//     collection = category_resultcollection;
+//     collection.find({ 'projID': task_id }, function (err, task) {
+//       if (err) {
+//         return res.send(err)
+//       }
+//       else {
+//         let List = [];
+//         let result_for_kappa = {};
+//         let category = [];
+//         task.forEach((x, _) => {
+//           let tem = {};
+//           tem["sentence"] = x["sentence"];
+//           tem["sentid"] = x["sentid"];
+//           tem["result"] = [];
+//           let Dic = {};
+//           let conf = 2;
+//
+//           x["category"].forEach(function (cate, i) {
+//             if (!category.includes(cate)) {
+//               category.push(cate);
+//             }
+//             if (x["meta"][i]) {
+//               let annotator_id = x["meta"][i]["submissionID"].toString();
+//
+//               if (!Object.keys(result_for_kappa).includes(annotator_id)) {
+//                 result_for_kappa[annotator_id] = {};
+//               }
+//
+//               result_for_kappa[annotator_id][x["sentid"]] = cate;
+//               if (!Dic.hasOwnProperty(x["meta"][i]["submissionID"])) {
+//                 Dic[x["meta"][i]["submissionID"]] = 0;
+//                 if (x["meta"][i].hasOwnProperty("confidence")) {
+//                   conf = x["meta"][i]["confidence"];
+//                 }
+//                 else {
+//                   conf = 2;
+//                 }
+//                 tem["result"].push({
+//                   "category": cate,
+//                   "annotator": x["meta"][i]["annotator"],
+//                   "submissionID": x["meta"][i]["submissionID"],
+//                   "confidence": conf,
+//                   "feedback": x["meta"][i]["feedback"],
+//                   "feedback_questions": x["meta"][i]["feedback_questions"]
+//                 });
+//                 tem["num"] = Object.keys(Dic).length;
+//                 List.push(tem);
+//               }
+//             }
+//           }
+//           );
+//         }
+//         );
+//         if (Object.keys(result_for_kappa).length < 2) {
+//           return res.json({ "status": 200, "flag": true, "response": List, "kappa": {} });
+//         }
+//         else {
+//           let kappa = {};
+//           Object.keys(result_for_kappa).forEach(annotator1 => {
+//             kappa[annotator1] = {}
+//             Object.keys(result_for_kappa).forEach(annotator2 => {
+//               if (annotator1 === annotator2) {
+//                 kappa[annotator1][annotator2] = null;
+//               }
+//               else {
+//                 let numeric1 = Cohen.nominalConversion(category, result_for_kappa[annotator1]);
+//                 let numeric2 = Cohen.nominalConversion(category, result_for_kappa[annotator2]);
+//                 kappa[annotator1][annotator2] = Cohen.kappa(numeric1, numeric2, category.length, 'none');
+//               }
+//
+//             })
+//           })
+//           return res.json({ "status": 200, "flag": true, "response": List, "kappa": kappa });
+//         }
+//       }
+//     });
+//   }
+//   else if (task_type === "sequence") {
+//     collection = sequence_resultcollection;
+//     collection.find({ 'projID': task_id }, function (err, task) {
+//       if (err) {
+//         return res.send(err)
+//       }
+//       else {
+//         return res.json({ "response": task, "status": 200 });
+//       }
+//     })
+//   }
+//   else {
+//     collection = quality_resultcollection;
+//     collection.find({ 'projID': task_id }, function (err, task) {
+//       if (err) {
+//         return res.send(err)
+//       }
+//       else {
+//         return res.json({ "response": task, "status": 200 });
+//       }
+//     })
+//   }
+// });
 
 // Deletes a HIT
-router.post('/delete/:task_type/:task_id', function (req, res, next) {
-  const taskType = req.params.task_type;
-  const taskId = req.params.task_id;
-  const password = req.body.password;
-
-  if (mapTaskModel[taskType] === undefined) {
-    return res.status(500).json({ error: "unsupported task" })
-  } else {
-    return mapTaskModel[taskType].resDeleteProject(
-      res, taskId, password
-    )
-  }
-
-  // need to remove the detail stuff too
-  let collection;
-  if (task_type === "interactive") {
-    collection = interactive_collection;
-    interactive_resultcollection.remove({ 'projID': task_id });
-  }
-  else if (task_type === "category") {
-    collection = category_collection;
-
-    category_resultcollection.remove({ 'projID': task_id });
-    category_detail_result_collection.remove({ 'taskId': task_id });
-  }
-  else if (task_type === "sequence") {
-    collection = sequence_collection;
-    sequence_resultcollection.remove({ 'projID': task_id });
-  }
-  else {
-    collection = quality_collection;
-    quality_resultcollection.remove({ 'projID': task_id });
-  }
-  collection.remove({ '_id': mongojs.ObjectID(task_id) }, function (err, task) {
-    if (err) {
-      res.send(err)
-    } else {
-      res.json({ "response": task });
-    }
-  })
-});
+// router.post('/delete/:task_type/:task_id', function (req, res, next) {
+//   const taskType = req.params.task_type;
+//   const taskId = req.params.task_id;
+//   const password = req.body.password;
+//
+//   if (mapTaskModel[taskType] === undefined) {
+//     return res.status(500).json({ error: "unsupported task" })
+//   } else {
+//     return mapTaskModel[taskType].resDeleteProject(
+//       res, taskId, password
+//     )
+//   }
+//
+//   // need to remove the detail stuff too
+//   let collection;
+//   if (task_type === "interactive") {
+//     collection = interactive_collection;
+//     interactive_resultcollection.remove({ 'projID': task_id });
+//   }
+//   else if (task_type === "category") {
+//     collection = category_collection;
+//
+//     category_resultcollection.remove({ 'projID': task_id });
+//     category_detail_result_collection.remove({ 'taskId': task_id });
+//   }
+//   else if (task_type === "sequence") {
+//     collection = sequence_collection;
+//     sequence_resultcollection.remove({ 'projID': task_id });
+//   }
+//   else {
+//     collection = quality_collection;
+//     quality_resultcollection.remove({ 'projID': task_id });
+//   }
+//   collection.remove({ '_id': mongojs.ObjectID(task_id) }, function (err, task) {
+//     if (err) {
+//       res.send(err)
+//     } else {
+//       res.json({ "response": task });
+//     }
+//   })
+// });
 
 // Deletes the result of the worker from that HIT -> where is this used
-router.get('/delete/result/:task_type/:task_id', function (req, res, next) {
-  const task_type = req.params.task_type;
-  const task_id = req.params.task_id;
-  // It is actually user id. Don't get fooled.
-  const idSubmission = parseInt(req.params.task_id);
-
-  let collection;
-  if (task_type === "interactive") {
-    collection = interactive_resultcollection;
-    collection.remove({ 'userID': task_id }, function (err, task) {
-    });
-    taskModelInteractive.resDeleteSubmission(res, idSubmission);
-  }
-  else if (task_type === "category") {
-    category_detail_result_collection.remove({ 'userId': parseInt(task_id) });
-    taskModelCategory.resDeleteSubmission(res, idSubmission);
-  }
-  else if (task_type === "sequence") {
-    taskModelSequence.resDeleteSubmission(res, idSubmission);
-  }
-  else {
-    taskModelQuality.resDeleteSubmission(res, idSubmission);
-  }
-
-});
+// router.get('/delete/result/:task_type/:task_id', function (req, res, next) {
+//   const task_type = req.params.task_type;
+//   const task_id = req.params.task_id;
+//   // It is actually user id. Don't get fooled.
+//   const idSubmission = parseInt(req.params.task_id);
+//
+//   let collection;
+//   if (task_type === "interactive") {
+//     collection = interactive_resultcollection;
+//     collection.remove({ 'userID': task_id }, function (err, task) {
+//     });
+//     taskModelInteractive.resDeleteSubmission(res, idSubmission);
+//   }
+//   else if (task_type === "category") {
+//     category_detail_result_collection.remove({ 'userId': parseInt(task_id) });
+//     taskModelCategory.resDeleteSubmission(res, idSubmission);
+//   }
+//   else if (task_type === "sequence") {
+//     taskModelSequence.resDeleteSubmission(res, idSubmission);
+//   }
+//   else {
+//     taskModelQuality.resDeleteSubmission(res, idSubmission);
+//   }
+//
+// });
 
 /*
 router.post('/actions/:lang/:taskId', function (req, res, next) {
