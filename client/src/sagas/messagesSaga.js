@@ -43,7 +43,8 @@ function* receiveMessageSaga(synth, sessionData, messageData) {
   const utterance = new SpeechSynthesisUtterance(message.replace("<p>", "..."));
   yield fork(logMessage, sessionData, message, "Bot")
   if (sessionData.mode !== 'text') {
-    yield call(speak, synth, utterance);
+      // TODO: I disabled the speech.
+      //yield call(speak, synth, utterance);
   }
   if (sessionData.mode === 'continuous') {
     yield put({ type: 'MICROPHONE_START' })
