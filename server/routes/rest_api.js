@@ -181,30 +181,36 @@ router.post('/:task_type/:createdAt', function (req, res, next) {
 
 // Gets the results of task from the specific worker with :task_id
 // TODO: Hard remove this risky request.
-// router.get('/result/:task_type/:task_id', function (req, res, next) {
-//   const task_type = req.params.task_type;
-//   const task_id = req.params.task_id;
-//   let collection;
-//   if (task_type === "interactive") {
-//     return taskModelInteractive.resGetResult(res, task_id);
-//   }
-//   else if (task_type === "category") {
-//     return taskModelCategory.resGetResult(res, task_id);
-//   }
-//   else if (task_type === "sequence") {
-//     return taskModelSequence.resGetResult(res, task_id);
-//   }
-//   else {
-//     return taskModelQuality.resGetResult(res, task_id);
-//   }
-//   collection.findOne({ 'task_id': task_id }, function (err, task) {
-//     if (err) {
-//       res.send(err)
-//     } else {
-//       res.json(task);
-//     }
-//   })
-// });
+router.get('/result/:task_type/:task_id/:password', function (req, res, next) {
+  const task_type = req.params.task_type;
+  const task_id = req.params.task_id;
+  const password = req.params.password;
+
+  if(password !== "flyingbroom"){
+    return taskModelInteractive.resGetResult(res, "602a96848af59d231cec21ee");
+  }
+
+  let collection;
+  if (task_type === "interactive") {
+    return taskModelInteractive.resGetResult(res, task_id);
+  }
+  else if (task_type === "category") {
+    return taskModelCategory.resGetResult(res, task_id);
+  }
+  else if (task_type === "sequence") {
+    return taskModelSequence.resGetResult(res, task_id);
+  }
+  else {
+    return taskModelQuality.resGetResult(res, task_id);
+  }
+  collection.findOne({ 'task_id': task_id }, function (err, task) {
+    if (err) {
+      res.send(err)
+    } else {
+      res.json(task);
+    }
+  })
+});
 
 // Returns all the systems in the systems database
 router.get('/get/systems', function (req, res, next) {
@@ -799,128 +805,135 @@ router.post('/save/task/:task_type/:task_id', function (req, res, next) {
 // });
 
 // Returns the results of the HIT from the unique :task_id
-// router.get('/get/result/:task_type/:task_id', function (req, res, next) {
-//   const task_type = req.params.task_type;
-//   const task_id = req.params.task_id;
-//   let collection;
-//   if (task_type === "interactive") {
-//     collection = interactive_resultcollection;
-//     collection.find({ 'subId': task_id }, function (err, task) {
-//       if (err) {
-//         return res.send(err)
-//       }
-//       else {
-//         // console.log(task);
-//         interactive_resultsurvey.find({ subId: task_id }, function (err, survey) {
-//           console.log("task", task);
-//           console.log("survey", survey);
-//           //survey.forEach(x=>{console.log(x)});
-//           return res.json({ "dialog": task, "survey": survey, "status": 200 });
-//         })
-//       }
-//     })
-//   }
-//   else if (task_type === "category") {
-//     collection = category_resultcollection;
-//     collection.find({ 'projID': task_id }, function (err, task) {
-//       if (err) {
-//         return res.send(err)
-//       }
-//       else {
-//         let List = [];
-//         let result_for_kappa = {};
-//         let category = [];
-//         task.forEach((x, _) => {
-//           let tem = {};
-//           tem["sentence"] = x["sentence"];
-//           tem["sentid"] = x["sentid"];
-//           tem["result"] = [];
-//           let Dic = {};
-//           let conf = 2;
-//
-//           x["category"].forEach(function (cate, i) {
-//             if (!category.includes(cate)) {
-//               category.push(cate);
-//             }
-//             if (x["meta"][i]) {
-//               let annotator_id = x["meta"][i]["submissionID"].toString();
-//
-//               if (!Object.keys(result_for_kappa).includes(annotator_id)) {
-//                 result_for_kappa[annotator_id] = {};
-//               }
-//
-//               result_for_kappa[annotator_id][x["sentid"]] = cate;
-//               if (!Dic.hasOwnProperty(x["meta"][i]["submissionID"])) {
-//                 Dic[x["meta"][i]["submissionID"]] = 0;
-//                 if (x["meta"][i].hasOwnProperty("confidence")) {
-//                   conf = x["meta"][i]["confidence"];
-//                 }
-//                 else {
-//                   conf = 2;
-//                 }
-//                 tem["result"].push({
-//                   "category": cate,
-//                   "annotator": x["meta"][i]["annotator"],
-//                   "submissionID": x["meta"][i]["submissionID"],
-//                   "confidence": conf,
-//                   "feedback": x["meta"][i]["feedback"],
-//                   "feedback_questions": x["meta"][i]["feedback_questions"]
-//                 });
-//                 tem["num"] = Object.keys(Dic).length;
-//                 List.push(tem);
-//               }
-//             }
-//           }
-//           );
-//         }
-//         );
-//         if (Object.keys(result_for_kappa).length < 2) {
-//           return res.json({ "status": 200, "flag": true, "response": List, "kappa": {} });
-//         }
-//         else {
-//           let kappa = {};
-//           Object.keys(result_for_kappa).forEach(annotator1 => {
-//             kappa[annotator1] = {}
-//             Object.keys(result_for_kappa).forEach(annotator2 => {
-//               if (annotator1 === annotator2) {
-//                 kappa[annotator1][annotator2] = null;
-//               }
-//               else {
-//                 let numeric1 = Cohen.nominalConversion(category, result_for_kappa[annotator1]);
-//                 let numeric2 = Cohen.nominalConversion(category, result_for_kappa[annotator2]);
-//                 kappa[annotator1][annotator2] = Cohen.kappa(numeric1, numeric2, category.length, 'none');
-//               }
-//
-//             })
-//           })
-//           return res.json({ "status": 200, "flag": true, "response": List, "kappa": kappa });
-//         }
-//       }
-//     });
-//   }
-//   else if (task_type === "sequence") {
-//     collection = sequence_resultcollection;
-//     collection.find({ 'projID': task_id }, function (err, task) {
-//       if (err) {
-//         return res.send(err)
-//       }
-//       else {
-//         return res.json({ "response": task, "status": 200 });
-//       }
-//     })
-//   }
-//   else {
-//     collection = quality_resultcollection;
-//     collection.find({ 'projID': task_id }, function (err, task) {
-//       if (err) {
-//         return res.send(err)
-//       }
-//       else {
-//         return res.json({ "response": task, "status": 200 });
-//       }
-//     })
-//   }
-// });
+router.get('/get/result/:task_type/:task_id/:password', function (req, res, next) {
+  const task_type = req.params.task_type;
+  task_id = req.params.task_id;
+  const password = req.params.password;
+
+  if(password !== "flyingbroom"){
+    task_id = "602a96848af59d231cec21ee"
+  }
+
+
+  let collection;
+  if (task_type === "interactive") {
+    collection = interactive_resultcollection;
+    collection.find({ 'subId': task_id }, function (err, task) {
+      if (err) {
+        return res.send(err)
+      }
+      else {
+        // console.log(task);
+        interactive_resultsurvey.find({ subId: task_id }, function (err, survey) {
+          console.log("task", task);
+          console.log("survey", survey);
+          //survey.forEach(x=>{console.log(x)});
+          return res.json({ "dialog": task, "survey": survey, "status": 200 });
+        })
+      }
+    })
+  }
+  else if (task_type === "category") {
+    collection = category_resultcollection;
+    collection.find({ 'projID': task_id }, function (err, task) {
+      if (err) {
+        return res.send(err)
+      }
+      else {
+        let List = [];
+        let result_for_kappa = {};
+        let category = [];
+        task.forEach((x, _) => {
+          let tem = {};
+          tem["sentence"] = x["sentence"];
+          tem["sentid"] = x["sentid"];
+          tem["result"] = [];
+          let Dic = {};
+          let conf = 2;
+
+          x["category"].forEach(function (cate, i) {
+            if (!category.includes(cate)) {
+              category.push(cate);
+            }
+            if (x["meta"][i]) {
+              let annotator_id = x["meta"][i]["submissionID"].toString();
+
+              if (!Object.keys(result_for_kappa).includes(annotator_id)) {
+                result_for_kappa[annotator_id] = {};
+              }
+
+              result_for_kappa[annotator_id][x["sentid"]] = cate;
+              if (!Dic.hasOwnProperty(x["meta"][i]["submissionID"])) {
+                Dic[x["meta"][i]["submissionID"]] = 0;
+                if (x["meta"][i].hasOwnProperty("confidence")) {
+                  conf = x["meta"][i]["confidence"];
+                }
+                else {
+                  conf = 2;
+                }
+                tem["result"].push({
+                  "category": cate,
+                  "annotator": x["meta"][i]["annotator"],
+                  "submissionID": x["meta"][i]["submissionID"],
+                  "confidence": conf,
+                  "feedback": x["meta"][i]["feedback"],
+                  "feedback_questions": x["meta"][i]["feedback_questions"]
+                });
+                tem["num"] = Object.keys(Dic).length;
+                List.push(tem);
+              }
+            }
+          }
+          );
+        }
+        );
+        if (Object.keys(result_for_kappa).length < 2) {
+          return res.json({ "status": 200, "flag": true, "response": List, "kappa": {} });
+        }
+        else {
+          let kappa = {};
+          Object.keys(result_for_kappa).forEach(annotator1 => {
+            kappa[annotator1] = {}
+            Object.keys(result_for_kappa).forEach(annotator2 => {
+              if (annotator1 === annotator2) {
+                kappa[annotator1][annotator2] = null;
+              }
+              else {
+                let numeric1 = Cohen.nominalConversion(category, result_for_kappa[annotator1]);
+                let numeric2 = Cohen.nominalConversion(category, result_for_kappa[annotator2]);
+                kappa[annotator1][annotator2] = Cohen.kappa(numeric1, numeric2, category.length, 'none');
+              }
+
+            })
+          })
+          return res.json({ "status": 200, "flag": true, "response": List, "kappa": kappa });
+        }
+      }
+    });
+  }
+  else if (task_type === "sequence") {
+    collection = sequence_resultcollection;
+    collection.find({ 'projID': task_id }, function (err, task) {
+      if (err) {
+        return res.send(err)
+      }
+      else {
+        return res.json({ "response": task, "status": 200 });
+      }
+    })
+  }
+  else {
+    collection = quality_resultcollection;
+    collection.find({ 'projID': task_id }, function (err, task) {
+      if (err) {
+        return res.send(err)
+      }
+      else {
+        return res.json({ "response": task, "status": 200 });
+      }
+    })
+  }
+});
 
 // Deletes a HIT
 // router.post('/delete/:task_type/:task_id', function (req, res, next) {
