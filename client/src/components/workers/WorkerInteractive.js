@@ -534,7 +534,7 @@ class WorkerInteractive extends React.Component {
       consent: "",
       radios: [],
       feedbackradio: [],
-      activeKey: ["1", "2"],
+      activeKey: ["1", "2", "3", "4"],
       questionSurveys: [],
       questionFeedbacks: [],
       questionSystems: [],
