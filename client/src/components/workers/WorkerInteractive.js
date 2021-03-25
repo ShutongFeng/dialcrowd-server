@@ -697,7 +697,7 @@ class WorkerInteractive extends React.Component {
             <Panel header="Dialogue Task " key="3" style={styles.tabTitle}>
               {_renderTasks(this.state.taskList)}
             </Panel>
-            <Panel header="Interactive Tests " key="4" style={styles.tabTitle}>
+            <Panel header="Start Your Task Here " key="4" style={styles.tabTitle}>
               {!this.state.activeKey.includes("2") ? (
                 <div style={{ textAlign: "center" }}>
                   <Button type="default" onClick={this.openInstructions}>
