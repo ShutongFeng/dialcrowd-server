@@ -534,7 +534,7 @@ class WorkerInteractive extends React.Component {
       consent: "",
       radios: [],
       feedbackradio: [],
-      activeKey: ["1", "2"],
+      activeKey: ["1", "2", "3", "4"],
       questionSurveys: [],
       questionFeedbacks: [],
       questionSystems: [],
@@ -631,7 +631,7 @@ class WorkerInteractive extends React.Component {
         </Drawer>
         <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }}>
           <Collapse
-            defaultActiveKey={["1", "2", "3"]}
+            defaultActiveKey={["1", "2", "3", "4"]}
             activeKey={this.state.activeKey}
             onChange={this.changeTab}
           >
