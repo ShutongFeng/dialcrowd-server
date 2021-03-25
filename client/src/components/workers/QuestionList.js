@@ -187,6 +187,8 @@ class QuestionList extends React.Component {
                   {systemNames.map((name) => (
                     <Radio value={name.replace(".", "")}>{name.replace(".", "")}</Radio>
                   ))}
+                    <Radio value={"Natural"}>{"Natural"}</Radio>
+
                 </Radio.Group>
               )}
             </Form.Item>

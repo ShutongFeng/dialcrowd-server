@@ -631,7 +631,7 @@ class WorkerInteractive extends React.Component {
         </Drawer>
         <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }}>
           <Collapse
-            defaultActiveKey={["1", "2", "3"]}
+              defaultActiveKey={["1", "2", "3"]}
             activeKey={this.state.activeKey}
             onChange={this.changeTab}
           >
@@ -671,30 +671,30 @@ class WorkerInteractive extends React.Component {
                 <b>${this.state.payment}</b> (USD).
               </p>
 
-              {this.showSystemExamples(styles)}
+              {/*{this.showSystemExamples(styles)}*/}
 
-              <div
-                style={{
-                  ...styles.example,
-                  fontSize: styles.example.fontSize + 4,
-                }}
-              >
-                <p>Example Answers for General Questions:</p>
-              </div>
-              <Table
-                rowKey="sentid"
-                dataSource={this.state.questionSurveys}
-                columns={columns}
-                pagination={false}
-                style={{
-                  ...styles.example,
-                  marginTop: `${styles.global.spacing}px`,
-                  marginBottom: `${styles.global.spacing}px`,
-                }}
-                size="small"
-              />
+              {/*<div*/}
+              {/*  style={{*/}
+              {/*    ...styles.example,*/}
+              {/*    fontSize: styles.example.fontSize + 4,*/}
+              {/*  }}*/}
+              {/*>*/}
+              {/*  <p>Example Answers for General Questions:</p>*/}
+              {/*</div>*/}
+              {/*<Table*/}
+              {/*  rowKey="sentid"*/}
+              {/*  dataSource={this.state.questionSurveys}*/}
+              {/*  columns={columns}*/}
+              {/*  pagination={false}*/}
+              {/*  style={{*/}
+              {/*    ...styles.example,*/}
+              {/*    marginTop: `${styles.global.spacing}px`,*/}
+              {/*    marginBottom: `${styles.global.spacing}px`,*/}
+              {/*  }}*/}
+              {/*  size="small"*/}
+              {/*/>*/}
             </Panel>
-            <Panel header="Dialogue Task" key="3" style={styles.tabTitle}>
+            <Panel header="Dialogue Task " key="3" style={styles.tabTitle}>
               {_renderTasks(this.state.taskList)}
             </Panel>
             <Panel header="Interactive Tests " key="4" style={styles.tabTitle}>
