@@ -658,18 +658,18 @@ class WorkerInteractive extends React.Component {
                 )}
               </div>
 
-              <p
-                style={{
-                  ...styles.instruction,
-                  marginTop: "0px",
-                  marginBottom: "0px",
-                  fontSize: styles.instruction.fontSize - 2,
-                }}
-              >
-                We expect this HIT will take{" "}
-                <b>{this.state.timepay} minute(s)</b> and we will pay{" "}
-                <b>${this.state.payment}</b> (USD).
-              </p>
+              {/*<p*/}
+              {/*  style={{*/}
+              {/*    ...styles.instruction,*/}
+              {/*    marginTop: "0px",*/}
+              {/*    marginBottom: "0px",*/}
+              {/*    fontSize: styles.instruction.fontSize - 2,*/}
+              {/*  }}*/}
+              {/*>*/}
+              {/*  We expect this HIT will take{" "}*/}
+              {/*  <b>{this.state.timepay} minute(s)</b> and we will pay{" "}*/}
+              {/*  <b>${this.state.payment}</b> (USD).*/}
+              {/*</p>*/}
 
               {/*{this.showSystemExamples(styles)}*/}
 
