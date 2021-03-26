@@ -427,13 +427,16 @@ class WorkerInteractive extends React.Component {
       }
     });
     console.log("talk_to_system_taskID", this.state.taskID);
+    let help_info = { text: JSON.stringify(this.state.current_task) };
+    console.log("help info", help_info);
     this.setState({
       chaturl:
         `${clientUrl}/chat?` +
         `option=${this.state.interface}&ip=${url}&userID=${this.state.userID}` +
         `&subId=${this.state.subId}&name_of_dialog=${system.name}` +
         `&taskID=${this.state.taskID}` +
-        `&help=${system.instruction}`,
+        `&help=${help_info.text}`,
+      // `&help=${system.instruction}`,
       current_system: system.name,
       visible: true,
       time: Date.now(),
@@ -583,7 +586,7 @@ class WorkerInteractive extends React.Component {
       lineHeight: "30px",
     };
 
-    console.log(this.state);
+    // console.log(this.state);
 
     const likerts = ["1 Strongly Disagree", "", "", "", "5 Strongly Agree"];
     const styles = getStyle(this.state.style, {
@@ -592,7 +595,7 @@ class WorkerInteractive extends React.Component {
         fontSize: 18,
       },
     });
-    console.log("render", this.state.current_task);
+    // console.log("render", this.state.current_task);
 
     return (
       <div style={styles.global}>
@@ -631,7 +634,7 @@ class WorkerInteractive extends React.Component {
         </Drawer>
         <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }}>
           <Collapse
-              defaultActiveKey={["1", "2", "3"]}
+            defaultActiveKey={["1", "2", "3"]}
             activeKey={this.state.activeKey}
             onChange={this.changeTab}
           >
@@ -697,7 +700,11 @@ class WorkerInteractive extends React.Component {
             <Panel header="Dialogue Task " key="3" style={styles.tabTitle}>
               {_renderTasks(this.state.taskList)}
             </Panel>
-            <Panel header="Start Your Task Here " key="4" style={styles.tabTitle}>
+            <Panel
+              header="Start Your Task Here "
+              key="4"
+              style={styles.tabTitle}
+            >
               {!this.state.activeKey.includes("2") ? (
                 <div style={{ textAlign: "center" }}>
                   <Button type="default" onClick={this.openInstructions}>
