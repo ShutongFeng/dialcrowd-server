@@ -620,6 +620,9 @@ class WorkerInteractive extends React.Component {
             position="relative"
             allowFullScreen
           />
+          <Button type="primary" shape="round" block onClick={this.onClose}>
+            Finish
+          </Button>
           <Alert
             message="Say Bye"
             description="Remember to say 'bye' to Dialogue System!"
@@ -630,16 +633,14 @@ class WorkerInteractive extends React.Component {
           />
           <Alert
             message="Do not click Return"
-            description="Clicking the return button on your browser will terminate the task. To exit the dialogue, click the form again or the Blue Finish Button Below."
+            description="Clicking the return button on your browser will terminate the task. To exit the dialogue, click the form again or the Blue Finish Button above."
             type="warning"
             icon={<CloseCircleOutlined />}
             showIcon={true}
             closable
           />
 
-          <Button type="primary" shape="round" block onClick={this.onClose}>
-            Finish
-          </Button>
+
 
         </Drawer>
         <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }}>
