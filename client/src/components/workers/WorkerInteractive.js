@@ -28,6 +28,8 @@ import { lists2Systems } from "../requesters/template/System.js";
 import { showFeedbackQuestion } from "./QuestionList.js";
 import { getStyle } from "./style.js";
 
+import { renderTasksButton } from "./showInteractiveTask.js";
+
 const Panel = Collapse.Panel;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -427,16 +429,17 @@ class WorkerInteractive extends React.Component {
       }
     });
     console.log("talk_to_system_taskID", this.state.taskID);
-    let help_info = { text: JSON.stringify(this.state.current_task) };
-    console.log("help info", help_info);
+    // let help_info = { text: JSON.stringify(this.state.current_task) };
+    // console.log("help info", help_info);
     this.setState({
       chaturl:
         `${clientUrl}/chat?` +
         `option=${this.state.interface}&ip=${url}&userID=${this.state.userID}` +
         `&subId=${this.state.subId}&name_of_dialog=${system.name}` +
         `&taskID=${this.state.taskID}` +
-        `&help=${help_info.text}`,
-      // `&help=${system.instruction}`,
+        `&help=${system.instruction}`,
+      // `&help=${help_info.text}`,
+
       current_system: system.name,
       visible: true,
       time: Date.now(),
@@ -596,6 +599,7 @@ class WorkerInteractive extends React.Component {
       },
     });
     // console.log("render", this.state.current_task);
+    let helpInfo = { text: JSON.stringify(this.state.current_task) };
 
     return (
       <div style={styles.global}>
@@ -606,6 +610,7 @@ class WorkerInteractive extends React.Component {
           onClose={this.onClose}
           visible={this.state.visible}
         >
+          {renderTasksButton(this.state.taskList)}
           <Iframe
             style={{ "margin-right": "10px" }}
             url={this.state.chaturl}
