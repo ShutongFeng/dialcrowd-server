@@ -1299,10 +1299,18 @@ router.post('/router/chat/usr_input', function (req, res, next) {
   server_url = cli_manager.get_url(session_id);
   console.log(server_url, "server_url")
 
-  if ("start" == usr_input.toLowerCase().trim()) {
-    cli_manager.activate_talk(session_id);
-    url = server_url.replace("%s", "init");
-    payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
+  if ("start" === usr_input.toLowerCase().trim()) {
+
+    let session_is_active = cli_manager.get_active(session_id)
+    console.log("IS ACTIVE?", session_is_active)
+    if(!session_is_active) {
+      url = server_url.replace("%s", "init");
+      payload = {"sessionID": session_id, "timeStamp": "TODO", "userID": userID}
+      cli_manager.activate_talk(session_id);
+    }else {
+      url = server_url.replace("%s", "next");
+      payload = { "sessionID": session_id, "text": usr_input, "asrConf": asr_conf, "timeStamp": "TODO", "userID": userID }
+    }
   }
   // else if ("bye" == usr_input.toLowerCase().trim()) {
   //   url = server_url.replace("%s", "end");
