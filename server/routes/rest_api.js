@@ -1132,7 +1132,7 @@ const client_manager = {
       is_new = false;
     }
     else {
-      msg = "Hello! Welcome to DialCrowd! Say or type START to begin."
+      msg = "Hello! Welcome to DialCrowd! Say START to begin."
       url = session_id.split("\t")[1] + "/%s";
       console.log(url);
       if (!(url.includes("http"))) {
@@ -1206,7 +1206,7 @@ const cli_manager = Object.create(client_manager);
 
 // Initializes and puts the new session in the client manager
 router.post('/router/chat/join', function (req, res, next) {
-  const session_id = req.body.sid + "";
+  let session_id = req.body.sid + "";
   if (!session_id) {
     console.log("Missing session id. Reject connection");
   }
@@ -1215,7 +1215,55 @@ router.post('/router/chat/join', function (req, res, next) {
     returned = cli_manager.join_client(session_id);
     is_new = returned[0];
     msg = returned[1];
-    res.send({ "action": 'status', "is_new": is_new, "msg": msg });
+
+    console.log("Init Sessions with session ID:", session_id)
+    server_url = cli_manager.get_url(session_id);
+    console.log(server_url, "server_url")
+    cli_manager.activate_talk(session_id);
+
+    url = server_url.replace("%s", "init");
+    userID = req.body.userId || 'userId';
+    payload = { "sessionID": session_id, "timeStamp": "TODO", "userID": userID }
+    console.log("Send message " + JSON.stringify(payload));
+    console.log(url)
+    request.post(url, {
+      json: payload
+    }, (error, resp, body) => {
+          if (error) {
+            console.error(error);
+            // console.log("LOG error")
+            // console.log(error)
+          }
+          if (resp) {
+            console.log(resp.statusCode);
+            console.log(body);
+
+            // console.log("LOG RESPONSE")
+            // console.log(resp)
+            if (resp.statusCode == 200) {
+              console.log("Received " + body);
+              response_get = get_resp(body);
+              console.log("msg", response_get[1], typeof response_get[1]);
+              console.log(JSON.stringify(response_get[1]));
+              console.log("sent message");
+              if (response_get[0]) {
+                cli_manager.deactivate_talk(session_id);
+              }
+              res.send({
+                "action": 'status',
+                "is_new": is_new,
+                "terminal": response_get[0],
+                "msg": response_get[1],
+                "display": response_get[3],
+                "extraDiv1": response_get[4],
+                "extraDiv2": response_get[5]
+              });
+            }
+          }
+        }
+    )
+
+    // res.send({ "action": 'status', "is_new": is_new, "msg": msg });
   }
 });
 
@@ -1276,10 +1324,15 @@ router.post('/router/chat/usr_input', function (req, res, next) {
   }, (error, resp, body) => {
     if (error) {
       console.error(error);
+      // console.log("LOG error")
+      // console.log(error)
     }
     if (resp) {
       console.log(resp.statusCode);
       console.log(body);
+
+      // console.log("LOG RESPONSE")
+      // console.log(resp)
       if (resp.statusCode == 200) {
         console.log("Received " + body);
         response_get = get_resp(body);
