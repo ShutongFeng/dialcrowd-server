@@ -1523,13 +1523,17 @@ router.get(
     console.log("validate dialogue (rest_api)");
     collection.find(
       { subId: task_id, userID: user_id, name_of_dialog: chatbot_name },
-      function (err, task) {
-        if (err) {
+      async function (err, task) {
+        if (err){
           console.log("err!", err);
           return res.send(err);
         } else {
           console.log("dialogueTest go");
-          return res.json(dialogueTest(task));
+          const task_info = await getTaskInfo(task_id)
+          console.log('=======================================')
+          console.log(task_info)
+          console.log('=======================================')
+          return res.json(dialogueTest(task, task_info));
         }
       }
     );
@@ -1541,6 +1545,52 @@ function randomSelect(list) {
     return "";
   }
   return list[Math.floor(Math.random() * list.length)];
+}
+
+function getTaskInfo(task_id) {
+
+  return new Promise((resolve, reject) => {
+
+
+    let collection = interactive_collection;
+
+    collection.findOne({ _id: mongojs.ObjectID(task_id)}, (err, task) => {
+      if (err) {reject(err)}
+           let obj = JSON.parse(JSON.stringify(task));
+      //console.log(obj);
+      let taskList = obj["interactive_task_data"];
+      //console.log("taskList", taskList);
+
+      let currentTask = [];
+      if (typeof taskList != "undefined") {
+        currentTask = randomSelect(taskList);
+      }
+      console.log("current task", currentTask);
+
+      resolve({ task: currentTask["sentence"] })
+    })
+
+  })
+
+
+  
+
+  // collection.findOne({ _id: mongojs.ObjectID(task_id) }, (err, task) => {
+  //     if (err) {return err}
+  //     let obj = JSON.parse(JSON.stringify(task));
+  //     //console.log(obj);
+  //     let taskList = obj["interactive_task_data"];
+  //     console.log("taskList", taskList);
+
+  //     let currentTask = [];
+  //     if (typeof taskList != "undefined") {
+  //       currentTask = randomSelect(taskList);
+  //     }
+  //     console.log("current task", currentTask);
+
+  //     return { task: currentTask["sentence"] }
+
+  // });
 }
 
 router.get("/get_interactive_task/:task_id", function (req, res, next) {
