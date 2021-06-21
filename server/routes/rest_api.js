@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path");
 const mongojs = require("mongojs");
 const request = require("request");
+var urllib = require("urllib");
 const passwordHash = require("password-hash");
 const utils = require(path.join(__dirname, "../constants"));
 const collections = [
@@ -187,7 +188,7 @@ router.post("/:task_type/:createdAt", function (req, res, next) {
 });
 
 // Gets the results of task from the specific worker with :task_id
-// TODO: Hard remove this risky request.
+// TODO: Hard remove this risky request
 router.get("/result/:task_type/:task_id/:password", function (req, res, next) {
   const task_type = req.params.task_type;
   const task_id = req.params.task_id;
@@ -1299,18 +1300,23 @@ router.post("/router/chat/join", function (req, res, next) {
     payload = { sessionID: session_id, timeStamp: "TODO", userID: userID };
     console.log("Send message " + JSON.stringify(payload));
     console.log(url);
-    request.post(
+    urllib.request(
       url,
       {
-        json: payload,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        content: JSON.stringify(payload),
       },
-      (error, resp, body) => {
+      (error, body, resp) => {
+        console.log("========Here========");
         if (error) {
+          console.log("error");
           console.error(error);
           // console.log("LOG error")
           // console.log(error)
         }
         if (resp) {
+          console.log("resp");
           console.log(resp.statusCode);
           console.log(body);
 
@@ -1318,7 +1324,7 @@ router.post("/router/chat/join", function (req, res, next) {
           // console.log(resp)
           if (resp.statusCode == 200) {
             console.log("Received " + body);
-            response_get = get_resp(body);
+            response_get = get_resp(JSON.parse(body));
             console.log("msg", response_get[1], typeof response_get[1]);
             console.log(JSON.stringify(response_get[1]));
             console.log("sent message");
