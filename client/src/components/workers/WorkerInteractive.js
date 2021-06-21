@@ -416,31 +416,60 @@ function SubmitFromUser(t, v, time) {
 }
 
 class WorkerInteractive extends React.Component {
-  talk_to_system = (system) => {
+  talk_to_system = (system, list, index) => {
     console.log("talk to system");
+    console.log("11111",list)
     let id = system.agent;
     let url = "";
-    // console.log(this.props)
+    // console.log("333",this.props.system)
 
     // lookup URL from the system list by matching the id.
-    this.props.system.forEach((x) => {
-      if (id === x["_id"]) {
-        url = x["url"];
-      }
-    });
-    console.log("talk_to_system_taskID", this.state.taskID);
+    let systemArr = []
+
+    if(sessionStorage.getItem('systemArr')) {
+      systemArr = JSON.parse(sessionStorage.getItem('systemArr'))
+    } else {
+      this.props.system.map(item => {
+        list.map(litem => {
+          if(item._id === litem.agent) {
+            systemArr.push(item)
+          } 
+        })
+      })
+      systemArr.sort(() => Math.random() - 0.5)
+      sessionStorage.setItem('systemArr', JSON.stringify(systemArr))
+    }
+    
+    // let random = Math.floor(Math.random() * systemArr.length)
+
+  //   console.log('systemArr', systemArr)
+
+    // this.props.system.forEach((x) => {
+    //   if (id === x["_id"]) {
+    //     url = x["url"];
+    //   }
+    // });
+    // console.log("talk_to_system_taskID", this.state.taskID);
     // let help_info = { text: JSON.stringify(this.state.current_task) };
     // console.log("help info", help_info);
+    // http://192.168.56.1:3000/chat
+    // ?option=text
+    // &ip=35.240.21.68:5001
+    // &userID=1624278559720
+    // &subId=60ca0ef9159ef548a88d193f
+    // &name_of_dialog=System2
+    // &taskID=10190
+    // &help=1
     this.setState({
       chaturl:
         `${clientUrl}/chat?` +
-        `option=${this.state.interface}&ip=${url}&userID=${this.state.userID}` +
-        `&subId=${this.state.subId}&name_of_dialog=${system.name}` +
+        `option=${this.state.interface}&ip=${systemArr[index].url}&userID=${this.state.userID}` +
+        `&subId=${this.state.subId}&name_of_dialog=${systemArr[index].name}` +
         `&taskID=${this.state.taskID}` +
-        `&help=${system.instruction}`,
+        `&help=${systemArr[index].instruction}`,
       // `&help=${help_info.text}`,
 
-      current_system: system.name,
+      current_system: systemArr[index].name,
       visible: true,
       time: Date.now(),
       isSubmit: true,
@@ -452,7 +481,7 @@ class WorkerInteractive extends React.Component {
     this.setState({ userID: time });
     console.log(time);
     const params = queryString.parse(window.location.search);
-    console.log(params);
+    console.log('params',params);
     if (params.ID) {
       var Id = params.ID;
       this.setState({ subId: Id });
@@ -463,6 +492,8 @@ class WorkerInteractive extends React.Component {
     getquestion(this, Id);
     getInteractiveTask(this, Id);
   }
+
+
   onClose = () => {
     let systems = this.state.system_time;
     systems.push({
@@ -551,7 +582,9 @@ class WorkerInteractive extends React.Component {
     };
   }
 
+
   render() {
+    console.log('this.props', this.props)
     const columns = [
       {
         title: "Question",
@@ -601,6 +634,8 @@ class WorkerInteractive extends React.Component {
     // console.log("render", this.state.current_task);
     let helpInfo = { text: JSON.stringify(this.state.current_task) };
 
+
+    // .sort(() => Math.random() - 0.5)
     return (
       <div style={styles.global}>
         <Drawer
@@ -750,7 +785,7 @@ class WorkerInteractive extends React.Component {
                 :
                 null
               */}
-              {this.state.questionSystems.map((system) => (
+              {this.state.questionSystems.map((system, index) => (
                 <div
                   key={system.key}
                   title={system.name}
@@ -787,7 +822,7 @@ class WorkerInteractive extends React.Component {
                         icon="message"
                         size={"large"}
                         style={{ margin: "10px" }}
-                        onClick={() => this.talk_to_system(system)}
+                        onClick={() => this.talk_to_system(system, this.state.questionSystems, index)}
                       />
                     )}
                   </div>
