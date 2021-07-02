@@ -146,7 +146,6 @@ function getquestion(t, id) {
       }
 
       let json = preprocess(response);
-      console.log("json", json);
 
       let questionSurveys;
       let questionFeedbacks;
@@ -187,7 +186,7 @@ function getquestion(t, id) {
       } else {
         questionSystems = addKeys(response.questionSystems);
       }
-      console.log("json.instructions", json.instructions);
+      sessionStorage.setItem('systemArr', JSON.stringify(questionSystems.sort(() => Math.random() - 0.5))) 
       t.setState({
         speech: json.speech,
         interface: response.interface,
@@ -202,6 +201,7 @@ function getquestion(t, id) {
         questionSurveys: questionSurveys,
         questionFeedbacks: questionFeedbacks,
         questionSystems: questionSystems,
+        systemArr: JSON.parse(sessionStorage.getItem('systemArr')),
         requirements: addKeys(response.requirements || []),
         hasFeedbackQuestion: response.hasFeedbackQuestion,
         style: response.style,
@@ -223,7 +223,6 @@ function getInteractiveTask(t, id) {
         taskList: task.tasks,
         taskID: task.taskID,
       });
-      console.log("getInteractiveTask", t.state.taskID, t.state.taskList);
     });
 }
 
@@ -264,17 +263,13 @@ function submitToMturk(t, hasProblem) {
   let search = window.location.search;
   let params = new URLSearchParams(search);
   let foo = params.get("assignmentId");
-  console.log(foo);
   let isProduction = params.get("mturkProduction");
-  console.log(isProduction);
 
   let submitURL = params.get("turkSubmitTo");
-  console.log(submitURL);
 
   //?assignmentId=34J10VATJGBKANG4MDCHRA6ME53QIH&foo=bar
   // let submissionPath = 'https://workersandbox.mturk.com/mturk/externalSubmit';
   // if(isProduction === "true"){
-  //   console.log("productionMode");
   //   submissionPath = "https://www.mturk.com/mturk/externalSubmit";
   // }
   //
@@ -312,17 +307,14 @@ function SubmitFromUser(t, v, time) {
       return response.json();
     })
     .then(function (json) {
-      console.log(json);
       if (json.success) {
         // validate the dialogue quality based on rules
-        console.log("t.state", t.state);
         let dialogueSystems = t.state.questionSystems;
         let promises = [];
 
         dialogueSystems.forEach((system) => {
-          console.log("dialog_test", system);
+          console.log("🚀 ~ file: WorkerInteractive.js ~ line 314 ~ dialogueSystems.forEach ~ system", system)
           const _p = new Promise((resolve, reject) => {
-            console.log("system name:", system.name);
             fetch(
               serverUrl +
                 "/api/validate/dialogue/" +
@@ -367,7 +359,6 @@ function SubmitFromUser(t, v, time) {
                 },
               });
             } else {
-              console.log("problem!!!");
               let problemPromopt = [];
               submissionProblem.forEach((problem) => {
                 problemPromopt.push(
@@ -398,11 +389,8 @@ function SubmitFromUser(t, v, time) {
               });
             }
 
-            console.log("submissionProblem is:" + submissionProblem.length);
           })
           .catch((err) => {
-            console.log(err.toString());
-            console.log("Error!");
           });
       } else {
         confirm({
@@ -416,21 +404,44 @@ function SubmitFromUser(t, v, time) {
 }
 
 class WorkerInteractive extends React.Component {
-  talk_to_system = (system) => {
-    console.log("talk to system");
+  talk_to_system = (system, list, index) => {
+
     let id = system.agent;
     let url = "";
-    // console.log(this.props)
 
     // lookup URL from the system list by matching the id.
+    // let systemArr = []
+
+    // if(sessionStorage.getItem('systemArr')) {
+    //   systemArr = JSON.parse(sessionStorage.getItem('systemArr'))
+    // } else {
+    //     list.map(litem => {
+    //       if(item._id === litem.agent) {
+    //         systemArr.push(item)
+    //       } 
+    //     })
+    //   systemArr.sort(() => Math.random() - 0.5)
+
+    //   sessionStorage.setItem('systemArr', JSON.stringify(systemArr)) 
+    // }
+    
+    // let random = Math.floor(Math.random() * systemArr.length)
+
+
     this.props.system.forEach((x) => {
       if (id === x["_id"]) {
         url = x["url"];
       }
     });
-    console.log("talk_to_system_taskID", this.state.taskID);
     // let help_info = { text: JSON.stringify(this.state.current_task) };
-    // console.log("help info", help_info);
+    // http://192.168.56.1:3000/chat
+    // ?option=text
+    // &ip=35.240.21.68:5001
+    // &userID=1624278559720
+    // &subId=60ca0ef9159ef548a88d193f
+    // &name_of_dialog=System2
+    // &taskID=10190
+    // &help=1
     this.setState({
       chaturl:
         `${clientUrl}/chat?` +
@@ -450,9 +461,7 @@ class WorkerInteractive extends React.Component {
   componentDidMount() {
     var time = Date.now();
     this.setState({ userID: time });
-    console.log(time);
     const params = queryString.parse(window.location.search);
-    console.log(params);
     if (params.ID) {
       var Id = params.ID;
       this.setState({ subId: Id });
@@ -463,6 +472,8 @@ class WorkerInteractive extends React.Component {
     getquestion(this, Id);
     getInteractiveTask(this, Id);
   }
+
+
   onClose = () => {
     let systems = this.state.system_time;
     systems.push({
@@ -487,7 +498,6 @@ class WorkerInteractive extends React.Component {
           });
         } else {
           SubmitFromUser(this, values, this.state.system_time);
-          console.log("Received values of form: ", values);
         }
       }
     });
@@ -548,8 +558,10 @@ class WorkerInteractive extends React.Component {
       current_task: [],
       taskID: "",
       taskList: [],
+      systemArr: []
     };
   }
+
 
   render() {
     const columns = [
@@ -589,7 +601,6 @@ class WorkerInteractive extends React.Component {
       lineHeight: "30px",
     };
 
-    // console.log(this.state);
 
     const likerts = ["1 Strongly Disagree", "", "", "", "5 Strongly Agree"];
     const styles = getStyle(this.state.style, {
@@ -598,9 +609,10 @@ class WorkerInteractive extends React.Component {
         fontSize: 18,
       },
     });
-    // console.log("render", this.state.current_task);
     let helpInfo = { text: JSON.stringify(this.state.current_task) };
 
+
+    // .sort(() => Math.random() - 0.5)
     return (
       <div style={styles.global}>
         <Drawer
@@ -750,7 +762,7 @@ class WorkerInteractive extends React.Component {
                 :
                 null
               */}
-              {this.state.questionSystems.map((system) => (
+              {this.state.systemArr.map((system, index) => (
                 <div
                   key={system.key}
                   title={system.name}
@@ -787,7 +799,7 @@ class WorkerInteractive extends React.Component {
                         icon="message"
                         size={"large"}
                         style={{ margin: "10px" }}
-                        onClick={() => this.talk_to_system(system)}
+                        onClick={() => this.talk_to_system(system, this.state.questionSystems, index)}
                       />
                     )}
                   </div>
