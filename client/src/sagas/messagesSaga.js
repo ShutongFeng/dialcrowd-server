@@ -7,16 +7,51 @@ import { serverUrl } from "../configs";
 
 export default function* messagesSaga(sessionData, sid, synth) {
   try {
-    const response = yield call(
+      yield put(addMessage("Connecting to the dialogue system. Please wait for the system response.", Date.now(), true));
+
+      const response = yield call(
       axios.post,
       serverUrl + "/api/router/chat/join",
       {
         sid: sid,
       }
     );
+
+    // console.log("HERE is the response ")
+    // console.log(response)
+
     if (response.data.action == "status") {
-      yield put(addMessage(response.data.msg, Date.now(), true));
+        if(!response.data.msg.includes("START"))
+            yield put(addMessage(response.data.msg, Date.now(), true));
+        else{
+
+            // let data = response.data
+            //
+            // data.sid = sid
+            // console.log("DATA?")
+            // console.log(data)
+            // yield call(sendMessageSaga, synth, data, "START");
+
+            // print("DATA")
+            // try {
+            //     const response = yield call(
+            //         axios.post,
+            //         serverUrl + "/api/router/chat/usr_input",
+            //         {
+            //             msg: "START",
+            //             sid: sid,
+            //         }
+            //     );
+            //     console.log("sendMessageSaga response START SESSION", response);
+            //     // yield call(receiveMessageSaga, synth, data, response.data);
+            // }
+            // catch (error) {
+            //     console.log(error);
+            // }
+
+        }
       console.log('SENT STATUS');
+      // TODO send message to server
     }
   }
   catch (error) {
@@ -43,7 +78,8 @@ function* receiveMessageSaga(synth, sessionData, messageData) {
   const utterance = new SpeechSynthesisUtterance(message.replace("<p>", "..."));
   yield fork(logMessage, sessionData, message, "Bot")
   if (sessionData.mode !== 'text') {
-    yield call(speak, synth, utterance);
+      // TODO: I disabled the speech.
+      //yield call(speak, synth, utterance);
   }
   if (sessionData.mode === 'continuous') {
     yield put({ type: 'MICROPHONE_START' })

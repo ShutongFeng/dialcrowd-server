@@ -43,6 +43,7 @@ class ConsentFormInner extends React.Component {
             title={page.title}
             width={page.width}
             height={page.height}
+            // height={1000}
             closable={false}
             maskClosable={false}
             bodyStyle={{flexGrow: 1}}
@@ -95,6 +96,8 @@ class ConsentFormInner extends React.Component {
           disabled={this.state.page === 0}>
           Previous Step
           </Button> */}
+      <a href={this.props.consent} download="consent.pdf"> You can also download our Consent Form Here </a>
+
       <Button key="reject" onClick={handleReject} danger>
         Reject
       </Button>
