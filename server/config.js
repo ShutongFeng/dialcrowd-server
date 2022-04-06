@@ -7,5 +7,5 @@ module.exports = {
     process.env.mongoPWD +
     "@" +
     process.env.mongoURI +
-    "/?retryWrites=true",
+    "/test?retryWrites=true",
 };
