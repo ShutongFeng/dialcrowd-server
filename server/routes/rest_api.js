@@ -1374,20 +1374,29 @@ router.post("/router/chat/usr_input", function (req, res, next) {
   }
   usr_input = req.body.msg || "empty";
   userID = req.body.userId || "userId";
+  taskID = req.body.taskID || "empty";
   asr_conf = req.body.score || 1.0;
   console.log(cli_manager._clients_to_id);
   console.log(session_id);
   server_url = cli_manager.get_url(session_id);
   console.log(server_url, "server_url");
+  console.log("-----------> taskID", taskID);
 
   if ("start" === usr_input.toLowerCase().trim()) {
     let session_is_active = cli_manager.get_active(session_id);
     console.log("IS ACTIVE?", session_is_active);
     if (!session_is_active) {
+      console.log("-----------> taskID", taskID);
       url = server_url.replace("%s", "init");
-      payload = { sessionID: session_id, timeStamp: "TODO", userID: userID };
+      payload = {
+        sessionID: session_id,
+        timeStamp: "TODO",
+        userID: userID,
+        taskID: taskID,
+      };
       cli_manager.activate_talk(session_id);
     } else {
+      console.log("-----------> taskID", taskID);
       url = server_url.replace("%s", "next");
       payload = {
         sessionID: session_id,
@@ -1395,6 +1404,7 @@ router.post("/router/chat/usr_input", function (req, res, next) {
         asrConf: asr_conf,
         timeStamp: "TODO",
         userID: userID,
+        taskID: taskID,
       };
     }
   }
@@ -1413,6 +1423,7 @@ router.post("/router/chat/usr_input", function (req, res, next) {
       asrConf: asr_conf,
       timeStamp: "TODO",
       userID: userID,
+      taskID: taskID,
     };
   }
 
@@ -1530,15 +1541,15 @@ router.get(
     collection.find(
       { subId: task_id, userID: user_id, name_of_dialog: chatbot_name },
       async function (err, task) {
-        if (err){
+        if (err) {
           console.log("err!", err);
           return res.send(err);
         } else {
           console.log("dialogueTest go");
-          const task_info = await getTaskInfo(task_id)
-          console.log('=======================================')
-          console.log(task_info)
-          console.log('=======================================')
+          const task_info = await getTaskInfo(task_id);
+          console.log("=======================================");
+          console.log(task_info);
+          console.log("=======================================");
           return res.json(dialogueTest(task, task_info));
         }
       }
@@ -1554,15 +1565,14 @@ function randomSelect(list) {
 }
 
 function getTaskInfo(task_id) {
-
   return new Promise((resolve, reject) => {
-
-
     let collection = interactive_collection;
 
-    collection.findOne({ _id: mongojs.ObjectID(task_id)}, (err, task) => {
-      if (err) {reject(err)}
-           let obj = JSON.parse(JSON.stringify(task));
+    collection.findOne({ _id: mongojs.ObjectID(task_id) }, (err, task) => {
+      if (err) {
+        reject(err);
+      }
+      let obj = JSON.parse(JSON.stringify(task));
       //console.log(obj);
       let taskList = obj["interactive_task_data"];
       //console.log("taskList", taskList);
@@ -1573,13 +1583,9 @@ function getTaskInfo(task_id) {
       }
       console.log("current task", currentTask);
 
-      resolve({ task: currentTask["sentence"] })
-    })
-
-  })
-
-
-  
+      resolve({ task: currentTask["sentence"] });
+    });
+  });
 
   // collection.findOne({ _id: mongojs.ObjectID(task_id) }, (err, task) => {
   //     if (err) {return err}
