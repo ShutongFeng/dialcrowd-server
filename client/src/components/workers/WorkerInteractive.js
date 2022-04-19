@@ -186,7 +186,10 @@ function getquestion(t, id) {
       } else {
         questionSystems = addKeys(response.questionSystems);
       }
-      sessionStorage.setItem('systemArr', JSON.stringify(questionSystems.sort(() => Math.random() - 0.5))) 
+      sessionStorage.setItem(
+        "systemArr",
+        JSON.stringify(questionSystems.sort(() => Math.random() - 0.5))
+      );
       t.setState({
         speech: json.speech,
         interface: response.interface,
@@ -201,7 +204,7 @@ function getquestion(t, id) {
         questionSurveys: questionSurveys,
         questionFeedbacks: questionFeedbacks,
         questionSystems: questionSystems,
-        systemArr: JSON.parse(sessionStorage.getItem('systemArr')),
+        systemArr: JSON.parse(sessionStorage.getItem("systemArr")),
         requirements: addKeys(response.requirements || []),
         hasFeedbackQuestion: response.hasFeedbackQuestion,
         style: response.style,
@@ -313,7 +316,10 @@ function SubmitFromUser(t, v, time) {
         let promises = [];
 
         dialogueSystems.forEach((system) => {
-          console.log("🚀 ~ file: WorkerInteractive.js ~ line 314 ~ dialogueSystems.forEach ~ system", system)
+          console.log(
+            "🚀 ~ file: WorkerInteractive.js ~ line 314 ~ dialogueSystems.forEach ~ system",
+            system
+          );
           const _p = new Promise((resolve, reject) => {
             fetch(
               serverUrl +
@@ -388,10 +394,8 @@ function SubmitFromUser(t, v, time) {
                 },
               });
             }
-
           })
-          .catch((err) => {
-          });
+          .catch((err) => {});
       } else {
         confirm({
           title: "Error",
@@ -405,7 +409,6 @@ function SubmitFromUser(t, v, time) {
 
 class WorkerInteractive extends React.Component {
   talk_to_system = (system, list, index) => {
-
     let id = system.agent;
     let url = "";
 
@@ -418,15 +421,14 @@ class WorkerInteractive extends React.Component {
     //     list.map(litem => {
     //       if(item._id === litem.agent) {
     //         systemArr.push(item)
-    //       } 
+    //       }
     //     })
     //   systemArr.sort(() => Math.random() - 0.5)
 
-    //   sessionStorage.setItem('systemArr', JSON.stringify(systemArr)) 
+    //   sessionStorage.setItem('systemArr', JSON.stringify(systemArr))
     // }
-    
-    // let random = Math.floor(Math.random() * systemArr.length)
 
+    // let random = Math.floor(Math.random() * systemArr.length)
 
     this.props.system.forEach((x) => {
       if (id === x["_id"]) {
@@ -472,7 +474,6 @@ class WorkerInteractive extends React.Component {
     getquestion(this, Id);
     getInteractiveTask(this, Id);
   }
-
 
   onClose = () => {
     let systems = this.state.system_time;
@@ -558,10 +559,9 @@ class WorkerInteractive extends React.Component {
       current_task: [],
       taskID: "",
       taskList: [],
-      systemArr: []
+      systemArr: [],
     };
   }
-
 
   render() {
     const columns = [
@@ -601,7 +601,6 @@ class WorkerInteractive extends React.Component {
       lineHeight: "30px",
     };
 
-
     const likerts = ["1 Strongly Disagree", "", "", "", "5 Strongly Agree"];
     const styles = getStyle(this.state.style, {
       dialogInstruction: {
@@ -610,7 +609,6 @@ class WorkerInteractive extends React.Component {
       },
     });
     let helpInfo = { text: JSON.stringify(this.state.current_task) };
-
 
     // .sort(() => Math.random() - 0.5)
     return (
@@ -651,9 +649,6 @@ class WorkerInteractive extends React.Component {
             showIcon={true}
             closable
           />
-
-
-
         </Drawer>
         <Form onSubmit={this.handleSubmit} style={{ "margin-bottom": 0.1 }}>
           <Collapse
@@ -783,15 +778,15 @@ class WorkerInteractive extends React.Component {
                       color: styles.dialogInstruction.color,
                     }}
                   >
-                    <span> Instructions: </span>
+                    {/* <span> Instructions: </span>
                     <br />
                     <span
                       className="ant-form-text"
                       style={styles.dialogInstruction}
                     >
                       <b>{system.instruction}</b>
-                    </span>
-                    <br />
+                    </span> */}
+                    {/* <br /> */}
                     <span>{`Click to talk ${system.name}:`}</span>
                     {getFieldDecorator("username")(
                       <Button
@@ -799,7 +794,13 @@ class WorkerInteractive extends React.Component {
                         icon="message"
                         size={"large"}
                         style={{ margin: "10px" }}
-                        onClick={() => this.talk_to_system(system, this.state.questionSystems, index)}
+                        onClick={() =>
+                          this.talk_to_system(
+                            system,
+                            this.state.questionSystems,
+                            index
+                          )
+                        }
                       />
                     )}
                   </div>
