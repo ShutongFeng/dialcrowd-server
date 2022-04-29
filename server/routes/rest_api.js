@@ -892,8 +892,8 @@ router.get(
           interactive_resultsurvey.find(
             { subId: task_id },
             function (err, survey) {
-              console.log("task", task);
-              console.log("survey", survey);
+              // console.log("task", task);
+              // console.log("survey", survey);
               //survey.forEach(x=>{console.log(x)});
               return res.json({ dialog: task, survey: survey, status: 200 });
             }
@@ -1616,7 +1616,7 @@ router.get("/get_interactive_task/:task_id", function (req, res, next) {
       let obj = JSON.parse(JSON.stringify(task));
       //console.log(obj);
       let taskList = obj["interactive_task_data"];
-      console.log("taskList", taskList);
+      //console.log("taskList", taskList);
 
       let currentTask = [];
       if (typeof taskList != "undefined") {
