@@ -26,13 +26,13 @@
     "node-fetch": "^2.6.1",
     "npm": "^6.1.0",
     "password-hash": "^1.2.2",
-    "react-scripts": "4.0.2",
+    "react-scripts": "^5.0.1",
     "request": "^2.88.2",
-    "socket.io": "^2.1.1",
+    "socket.io": "^4.5.0",
     "urllib": "^2.37.2",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "nodemon": "^2.0.16"
   }
 }
