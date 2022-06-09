@@ -1014,64 +1014,64 @@ router.get(
 );
 
 // Deletes a HIT
-router.post("/delete/:task_type/:task_id", function (req, res, next) {
-  const taskType = req.params.task_type;
-  const taskId = req.params.task_id;
-  const password = req.body.password;
+// router.post("/delete/:task_type/:task_id", function (req, res, next) {
+//   const taskType = req.params.task_type;
+//   const taskId = req.params.task_id;
+//   const password = req.body.password;
 
-  if (mapTaskModel[taskType] === undefined) {
-    return res.status(500).json({ error: "unsupported task" });
-  } else {
-    return mapTaskModel[taskType].resDeleteProject(res, taskId, password);
-  }
+//   if (mapTaskModel[taskType] === undefined) {
+//     return res.status(500).json({ error: "unsupported task" });
+//   } else {
+//     return mapTaskModel[taskType].resDeleteProject(res, taskId, password);
+//   }
 
-  // need to remove the detail stuff too
-  let collection;
-  if (task_type === "interactive") {
-    collection = interactive_collection;
-    interactive_resultcollection.remove({ projID: task_id });
-  } else if (task_type === "category") {
-    collection = category_collection;
+//   // need to remove the detail stuff too
+//   let collection;
+//   if (task_type === "interactive") {
+//     collection = interactive_collection;
+//     interactive_resultcollection.remove({ projID: task_id });
+//   } else if (task_type === "category") {
+//     collection = category_collection;
 
-    category_resultcollection.remove({ projID: task_id });
-    category_detail_result_collection.remove({ taskId: task_id });
-  } else if (task_type === "sequence") {
-    collection = sequence_collection;
-    sequence_resultcollection.remove({ projID: task_id });
-  } else {
-    collection = quality_collection;
-    quality_resultcollection.remove({ projID: task_id });
-  }
-  collection.remove({ _id: mongojs.ObjectID(task_id) }, function (err, task) {
-    if (err) {
-      res.send(err);
-    } else {
-      res.json({ response: task });
-    }
-  });
-});
+//     category_resultcollection.remove({ projID: task_id });
+//     category_detail_result_collection.remove({ taskId: task_id });
+//   } else if (task_type === "sequence") {
+//     collection = sequence_collection;
+//     sequence_resultcollection.remove({ projID: task_id });
+//   } else {
+//     collection = quality_collection;
+//     quality_resultcollection.remove({ projID: task_id });
+//   }
+//   collection.remove({ _id: mongojs.ObjectID(task_id) }, function (err, task) {
+//     if (err) {
+//       res.send(err);
+//     } else {
+//       res.json({ response: task });
+//     }
+//   });
+// });
 
-// Deletes the result of the worker from that HIT -> where is this used
-router.get("/delete/result/:task_type/:task_id", function (req, res, next) {
-  const task_type = req.params.task_type;
-  const task_id = req.params.task_id;
-  // It is actually user id. Don't get fooled.
-  const idSubmission = parseInt(req.params.task_id);
+// // Deletes the result of the worker from that HIT -> where is this used
+// router.get("/delete/result/:task_type/:task_id", function (req, res, next) {
+//   const task_type = req.params.task_type;
+//   const task_id = req.params.task_id;
+//   // It is actually user id. Don't get fooled.
+//   const idSubmission = parseInt(req.params.task_id);
 
-  let collection;
-  if (task_type === "interactive") {
-    collection = interactive_resultcollection;
-    collection.remove({ userID: task_id }, function (err, task) {});
-    taskModelInteractive.resDeleteSubmission(res, idSubmission);
-  } else if (task_type === "category") {
-    category_detail_result_collection.remove({ userId: parseInt(task_id) });
-    taskModelCategory.resDeleteSubmission(res, idSubmission);
-  } else if (task_type === "sequence") {
-    taskModelSequence.resDeleteSubmission(res, idSubmission);
-  } else {
-    taskModelQuality.resDeleteSubmission(res, idSubmission);
-  }
-});
+//   let collection;
+//   if (task_type === "interactive") {
+//     collection = interactive_resultcollection;
+//     collection.remove({ userID: task_id }, function (err, task) {});
+//     taskModelInteractive.resDeleteSubmission(res, idSubmission);
+//   } else if (task_type === "category") {
+//     category_detail_result_collection.remove({ userId: parseInt(task_id) });
+//     taskModelCategory.resDeleteSubmission(res, idSubmission);
+//   } else if (task_type === "sequence") {
+//     taskModelSequence.resDeleteSubmission(res, idSubmission);
+//   } else {
+//     taskModelQuality.resDeleteSubmission(res, idSubmission);
+//   }
+// });
 
 /*
 router.post('/actions/:lang/:taskId', function (req, res, next) {
