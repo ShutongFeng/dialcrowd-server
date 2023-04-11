@@ -2,6 +2,9 @@
   "name": "DialCrowd",
   "version": "1.0.0",
   "description": "Backend server for dialcrowd",
+  "engines": {
+    "node": "19.3.0"
+  },
   "scripts": {
     "start": "node server/server.js",
     "postinstall": "cd client && npm install && npm run build"
