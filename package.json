@@ -6,8 +6,8 @@
     "node": "18.x.x"
   },
   "scripts": {
-    "start": "NODE_OPTIONS=--openssl-legacy-provider  node server/server.js",
-    "postinstall": "NODE_OPTIONS=--openssl-legacy-provider  cd client && npm install && npm run build"
+    "start": "node server/server.js",
+    "postinstall": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
