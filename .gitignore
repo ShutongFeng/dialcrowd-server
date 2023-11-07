@@ -5,3 +5,4 @@
 .*
 *.wiki/
 !.gitlab-ci.yml
+.vercel
