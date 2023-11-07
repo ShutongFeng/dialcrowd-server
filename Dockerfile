@@ -1,13 +1,10 @@
-FROM node:12
+FROM node:13.8.0
 
 WORKDIR /usr/src/app
 
 ADD . .
 
-WORKDIR /usr/src/app
-
-ENV GENERATE_SOURCEMAP false
-RUN npm install --no-save --unsafe-perm
+RUN npm install
 
 EXPOSE 3040
 

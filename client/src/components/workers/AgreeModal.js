@@ -1,6 +1,5 @@
 import React from "react";
-import {Button, Modal, Divider, Form, Checkbox, Input} from 'antd';
-
+import { Button, Modal, Divider, Form, Checkbox, Input } from "antd";
 
 class ConsentFormInner extends React.Component {
   /* Props
@@ -11,14 +10,14 @@ class ConsentFormInner extends React.Component {
    * @{String} consent: PDF source of the consent form document.
    * @{Array} checkboxes: [{key: @{int}, content: @{string}}]
    */
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
       visible: this.props.initState || true,
       page: 0,
     };
   }
-  
+
   render() {
     const visible = this.state.visible || this.state.forceShow;
     const checkboxes = this.props.handleAccept || this.close;
@@ -28,8 +27,10 @@ class ConsentFormInner extends React.Component {
       return null;
     } else {
       const page = pages[this.state.page];
-      const footer = this.state.page === pages.length - 1 ?
-                     this._showAcceptRejectButton() : this._showPageButton();      
+      const footer =
+        this.state.page === pages.length - 1
+          ? this._showAcceptRejectButton()
+          : this._showPageButton();
       return (
         <>
           <style>
@@ -43,9 +44,10 @@ class ConsentFormInner extends React.Component {
             title={page.title}
             width={page.width}
             height={page.height}
+            // height={1000}
             closable={false}
             maskClosable={false}
-            bodyStyle={{flexGrow: 1}}
+            bodyStyle={{ flexGrow: 1 }}
             centered
             zIndex={1000}
             footer={footer}
@@ -58,16 +60,16 @@ class ConsentFormInner extends React.Component {
   }
 
   close = () => {
-    this.setState({visible: false});
-  }
+    this.setState({ visible: false });
+  };
 
   handleReject = () => {
     Modal.warning({
-      title: 'Thank you for your time.',
-      content: 'Please return to Amazon Mechanical Turk',
-      zIndex: 2000
+      title: "Thank you for your time.",
+      content: "Please return to Amazon Mechanical Turk",
+      zIndex: 2000,
     });
-  }
+  };
 
   handleAccept = () => {
     this.props.form.validateFields((err, values) => {
@@ -78,45 +80,58 @@ class ConsentFormInner extends React.Component {
         }
       }
     });
-  }
+  };
 
   nextPage = () => {
-    this.setState({page: this.state.page + 1});
+    this.setState({ page: this.state.page + 1 });
   };
 
   prevPage = () => {
-    this.setState({page: this.state.page - 1});
+    this.setState({ page: this.state.page - 1 });
   };
-  
+
   _showPageButton = () => {
     const handleReject = this.props.handleReject || this.handleReject;
-    return (<>
-      {/* <Button onClick={this.prevPage}
+    return (
+      <>
+        {/* <Button onClick={this.prevPage}
           disabled={this.state.page === 0}>
           Previous Step
           </Button> */}
-      <Button key="reject" onClick={handleReject} danger>
-        Reject
-      </Button>
-      <Button type="primary" onClick={this.nextPage}>
-        Agree & Next
-      </Button>
-    </>);    
-  }
+        <a href={this.props.consent} download="consent.pdf">
+          {" "}
+          You can also download our Consent Form Here{" "}
+        </a>
+
+        <Button key="reject" onClick={handleReject} danger>
+          Reject
+        </Button>
+        <Button type="primary" onClick={this.nextPage}>
+          Agree & Next
+        </Button>
+      </>
+    );
+  };
 
   _showAcceptRejectButton = () => {
     const handleReject = this.props.handleReject || this.handleReject;
     const handleAccept = this.handleAccept;
-    return (<>
-      {/* <Button key="reject" onClick={handleReject} danger>
+    return (
+      <>
+        {/* <Button key="reject" onClick={handleReject} danger>
           Reject
           </Button> */}
-      <Button key="accept" type="primary"
-              closable="false" onClick={handleAccept}>
-        Start the task!
-      </Button>
-    </>);
-  }
+        <Button
+          key="accept"
+          type="primary"
+          closable="false"
+          onClick={handleAccept}
+        >
+          Agree
+        </Button>
+      </>
+    );
+  };
 
   _makePages = () => {
     let pages = [];
@@ -127,43 +142,44 @@ class ConsentFormInner extends React.Component {
         width: "90%",
         height: "calc(100% - 20px)",
         title: <h2> Please read and agree to the consent form. </h2>,
-        content: <iframe src={this.props.consent}
-                         height="100%" width="100%"></iframe>
+        content: (
+          <iframe src={this.props.consent} height="100%" width="100%"></iframe>
+        ),
       });
     }
-  
+
     // add page if checkboxes are given.
-    if (this.props.checkboxes !== undefined
-        && this.props.checkboxes.length > 0) {
+    if (
+      this.props.checkboxes !== undefined &&
+      this.props.checkboxes.length > 0
+    ) {
       pages.push({
-        title: <h2>Please check all that apply.</h2>,        
+        title: <h2>Please check all that apply.</h2>,
         content: this.props.checkboxes.map((checkbox) => (
           <Form.Item>
             {this.props.form.getFieldDecorator(`checkbox[${checkbox.key}]`, {
               valuePropName: "checked",
               initialValue: false,
-              validateTrigger: ['onChange', 'onBlur'],
-              rules : [{
-                required: true,
-                transform: value => (value || undefined),
-                type: "boolean",
-                message: "You must fulfill this requirement in order to do this task!"
-              }]
-            }
-            )(
-              <Checkbox key={checkbox.key}>
-                {checkbox.content}
-              </Checkbox>
-            )}
+              validateTrigger: ["onChange", "onBlur"],
+              rules: [
+                {
+                  required: true,
+                  transform: (value) => value || undefined,
+                  type: "boolean",
+                  message:
+                    "You must fulfill this requirement in order to do this task!",
+                },
+              ],
+            })(<Checkbox key={checkbox.key}>{checkbox.content}</Checkbox>)}
           </Form.Item>
-        ))
+        )),
       });
     }
 
     return pages;
-  }
+  };
 }
 
 const ConsentForm = Form.create()(ConsentFormInner);
 
-export {ConsentForm,};
+export { ConsentForm };

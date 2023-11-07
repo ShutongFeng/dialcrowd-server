@@ -3,6 +3,5 @@
 */node_modules/*
 /node_modules
 .*
-*-lock.json
 *.wiki/
 !.gitlab-ci.yml

@@ -2,9 +2,12 @@
   "name": "DialCrowd",
   "version": "1.0.0",
   "description": "Backend server for dialcrowd",
+  "engines": {
+    "node": "16.x.x"
+  },
   "scripts": {
     "start": "node server/server.js",
-    "postinstall": "cd client && npm install --no-save && npm run build"
+    "postinstall": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
@@ -23,13 +26,16 @@
     "express": "^4.16.3",
     "mongojs": "^3.1.0",
     "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
     "npm": "^6.1.0",
     "password-hash": "^1.2.2",
-    "react-scripts": "^4.0.2",
-    "socket.io": "^2.1.1",
+    "react-scripts": "^5.0.1",
+    "request": "^2.88.2",
+    "socket.io": "^4.5.0",
+    "urllib": "^2.37.2",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "nodemon": "^2.0.16"
   }
 }
