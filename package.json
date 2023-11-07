@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Backend server for dialcrowd",
   "engines": {
-    "node": "20.x.x"
+    "node": "18.x.x"
   },
   "scripts": {
     "start": "NODE_OPTIONS=--openssl-legacy-provider  node server/server.js",
