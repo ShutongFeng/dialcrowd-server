@@ -11,13 +11,15 @@ openssl req -new -key PRIVATE_KEY_FILE -out public.csr
 *Be sure to enter the correct email address (firstname.lastname@hhu.de)*
 ref: https://wiki.hhu.de/display/HHU/CSR+unter+Ubuntu
 
-# Apply for a server certificate
+## Apply for a server certificate
 Go to this link: https://cert-manager.com/customer/DFN/ssl/aitxMaFXc6Doh3lN4vrH/login
 
 ref: https://www.zim.hhu.de/servicekatalog/netze/server-zertifikate
 
 ref: https://wiki.hhu.de/display/HHU/Serverzertifikat+beantragen
 
-# HTTP2HTTPS
+## HTTP2HTTPS
 https://cloud.google.com/load-balancing/docs/https/setting-up-http-https-redirect
 
+# Add Swap Space
+ref: https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
