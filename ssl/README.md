@@ -15,6 +15,9 @@ ref: https://wiki.hhu.de/display/HHU/CSR+unter+Ubuntu
 Go to this link: https://cert-manager.com/customer/DFN/ssl/aitxMaFXc6Doh3lN4vrH/login
 
 ref: https://www.zim.hhu.de/servicekatalog/netze/server-zertifikate
+
 ref: https://wiki.hhu.de/display/HHU/Serverzertifikat+beantragen
 
+# HTTP2HTTPS
+https://cloud.google.com/load-balancing/docs/https/setting-up-http-https-redirect
 
