@@ -24,7 +24,7 @@ app.get('*', function (req, res) {
 
 // cors setting TODO set to https://dialeval.cs.hhu.de?
 app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://dialcrowdv4-8iyzy4135-shutong-fengs-projects.vercel.app')
+  res.setHeader('Access-Control-Allow-Origin', 'https://dialcrowdv4-orcin.vercel.app/')
 });
 
 server.listen(process.env.PORT || PORT, function () {
