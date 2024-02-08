@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan')
 const app = module.exports.app = express();
 const path = require('path');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const server = require('http').createServer(app);
 const restApi = require(path.join(__dirname, 'routes/rest_api'));
@@ -23,8 +24,9 @@ app.get('*', function (req, res) {
 });
 
 // cors setting TODO set to https://dialeval.cs.hhu.de?
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', process.env.frontEndURL)
 });
 
 server.listen(process.env.PORT || PORT, function () {
